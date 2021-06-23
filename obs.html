@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello</title>
+      <script src = "/socket.io/socket.io.js"></script>
+      <style>
+        body {margin:0}
+      </style>
+      <script>
+        const socket = io();
+        
+      </script>
+   </head>
+   <body>
+    <h1>Hello OBS World!</h1>
+    <button id="send">Send</button>
+    <script>
+
+      document.getElementById("send").addEventListener("click", () => {
+        socket.emit("helloServer", {id: socket.id});
+      });
+
+    </script>
+   </body>
+</html>

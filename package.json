@@ -1,0 +1,17 @@
+{
+  "name": "socketio-express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "watch": "nodemon server.js",
+    "pkg": "pkg server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.1.2"
+  },
+  "devDependencies": {}
+}
