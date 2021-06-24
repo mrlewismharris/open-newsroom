@@ -1,24 +1,68 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const fs = require('fs');
 
-app.get('/', function(req, res) {
+let sceneCollection = [];
+let serverFirstRun = true;
+let collectionName = "";
+
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
-app.get('/obs', function(req, res) {
+app.get('/obs', (req, res) => {
   res.sendFile(__dirname + '/obs.html');
 });
 
-io.on('connection', function(socket) {
-  console.log('A user connected');
-  socket.on("helloServer", () => {
-    console.log("connection sent from client " + socket.id);
+io.on('connection', (socket) => {
+
+  if (serverFirstRun) {
+    fs.readdir('fs/collections', (err, files) => {
+      io.emit('serverFirstRun', files)
+    })
+  }
+
+  socket.on('chooseCollection', (name) => {
+    collectionName = name
+    reloadCollection()
   })
 
-  socket.on('disconnect', () => {
-   console.log('A user disconnected');
-  });
+  function reloadCollection() {
+    console.log(`Attempting to read "fs/collections/${collectionName}"`)
+    if (fs.existsSync(`fs/collections/${collectionName}`)) {
+      fs.readFile(`fs/collections/${collectionName}`, "utf8", (err, data) => {
+        if (err) {console.log(err)}
+        sceneCollection = JSON.parse(data)
+        console.log("Read successful! Scene collection set")
+      })
+    } else {
+      fs.writeFile(`fs/collections/${collectionName}`, "", (err) => {
+        if (err) throw err;
+        console.log('FS: Save File Updated')
+      })
+    }
+  }
+
+  io.emit('broadcastSceneCollection', sceneCollection);
+
+  socket.on('addScene', (data) => {
+    for (i=0;i<sceneCollection.length;i++) {
+      console.log(`Checking if ${i} of sceneCollection is ${data.name}`)
+      if (data.name == sceneCollection[i].name) {
+        console.log(`Duplicate found! ${i} of sceneCollection was "${sceneCollection[i].name}"`)
+        sceneCollection.splice(i, 1)
+      }
+    }
+    sceneCollection.push(data)
+    console.log(sceneCollection)
+    io.emit('update-scene', data)
+    fs.writeFile(`fs/collections/${collectionName}`, JSON.stringify(data), (err) => {
+      if (err) throw err;
+      console.log('FS: Save File Updated')
+    })
+  })
+
 });
 
 http.listen(3000, () => {

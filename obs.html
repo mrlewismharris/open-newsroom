@@ -5,20 +5,20 @@
       <script src = "/socket.io/socket.io.js"></script>
       <style>
         body {margin:0}
+        #mainContainer {width:1920px;height:1080px;}
       </style>
-      <script>
-        const socket = io();
-        
-      </script>
+      <script>const socket = io();</script>
    </head>
    <body>
-    <h1>Hello OBS World!</h1>
-    <button id="send">Send</button>
+    <div id="mainContainer"></div>
     <script>
 
-      document.getElementById("send").addEventListener("click", () => {
-        socket.emit("helloServer", {id: socket.id});
-      });
+      socket.on("broadcastSceneCollection", (data) => {
+        let screen = document.getElementById("mainContainer");
+        screen.innerHTML = "";
+        console.log(data);
+        //screen.append(data);
+      })
 
     </script>
    </body>

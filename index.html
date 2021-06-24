@@ -4,6 +4,36 @@
       <title>Hello</title>
       <script src = "/socket.io/socket.io.js"></script>
       <script>const socket = io();</script>
+      <style>
+         body {margin:0;background:#333}
+         .centerBox {width:200px;height:50px;display:block;margin:auto;margin-top:200px;}
+         #sendUpdate {width:100%;}
+      </style>
    </head>
-   <h1>Hello World!</h1>
+   <div class="centerBox">
+      <button id="sendUpdate">Send Update</button>
+   </div>
+   <script>
+
+      let scene = {name: "default", elements: []}
+      scene.elements.push({htmlType: "div", parent: null, child: null, css: "top:500px;left:200px;background:#000;color:#fff;z-index:100"})
+      scene.elements.push({htmlType: "div", parent: null, child: null, css: "top:800px;left:700px;background:#000;color:#fff;z-index:100"})
+
+      document.getElementById("sendUpdate").addEventListener("click", () => {
+         console.log(scene)
+         socket.emit("addScene", scene)
+      })
+
+      socket.on('serverFirstRun', (data) => {
+         let existing = ""
+         console.log(data)
+         data.forEach(title => {
+            if (existing.length > 0) { existing.concat(", ") }
+            existing.concat(`"${title}"`)
+         })
+         let chosenCollection = prompt(`Please choose an existing collection (${data}) or enter new:`, data[0])
+         socket.emit('chooseCollection', chosenCollection)
+      })
+
+   </script>
 </html>
