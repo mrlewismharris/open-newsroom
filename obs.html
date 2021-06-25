@@ -16,7 +16,7 @@
 
       socket.on("broadcastSceneCollection", (data) => {
         let screen = document.getElementById("mainContainer");
-        screen.innerHTML = "";
+        //screen.innerHTML = "";
         console.log(data);
         //screen.append(data);
       })
@@ -29,6 +29,7 @@
           let element = document.createElement(el.type)
           element.className = "onscreenElement"
           element.style = el.params
+          element.innerText = el.content
           console.log(element)
           main.appendChild(element)
         })

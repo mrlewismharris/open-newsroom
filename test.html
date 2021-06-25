@@ -12,7 +12,8 @@
         <option>div</option>
         <option>h1</option>
       </select><br/>
-      CSS: <textarea id="elementParams" cols="30" rows="3"></textarea><br/>
+      CSS: <textarea id="elementParams" cols="70" rows="4"></textarea><br/>
+      Content: <input type="text" id="elementContent"><br/>
       <button id="htmlSendUpdate">Add</button>
       <h3>Scene</h3>
       <div id="sceneElements"></div>
@@ -23,10 +24,12 @@
       document.getElementById("htmlSendUpdate").addEventListener("click", () => {
         let type = document.getElementById("elementType")
         let params = document.getElementById("elementParams")
+        let content = document.getElementById("elementContent")
         if (type.value == "" || params.value == "") return
-        addToScene({"type": type.value, "params": params.value})
+        addToScene({"type": type.value, "params": params.value, "content": content.value})
         type.value = "p"
         params.value = ""
+        content.value = ""
       })
 
       function addToScene(item) {
@@ -39,7 +42,7 @@
         let outString = ""
         scene.forEach((item, i) => {
           if (outString.length > 0) {outString += "<br>"}
-          outString += "Item " + i + " : " + item.type + ", " + item.params
+          outString += `Item ${i} : ${item.type}, ${item.params} , ${item.content}`
         })
         output.innerHTML = `<p>${outString}</p>`
       }
