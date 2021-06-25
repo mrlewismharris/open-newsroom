@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>Hello</title>
+      <meta charset="UTF-8">
+      <script src = "/socket.io/socket.io.js"></script>
+    </head>
+      <h3>Add New Element to Scene</h3>
+      Element:
+      <select id="elementType">
+        <option>p</option>
+        <option>div</option>
+        <option>h1</option>
+      </select><br/>
+      CSS: <textarea id="elementParams" cols="30" rows="3"></textarea><br/>
+      <button id="htmlSendUpdate">Add</button>
+      <h3>Scene</h3>
+      <div id="sceneElements"></div>
+      <button id="sendScene">Send Elements</button>
+    <script>
+      const socket = io()
+      const scene = [];
+      document.getElementById("htmlSendUpdate").addEventListener("click", () => {
+        let type = document.getElementById("elementType")
+        let params = document.getElementById("elementParams")
+        if (type.value == "" || params.value == "") return
+        addToScene({"type": type.value, "params": params.value})
+        type.value = "p"
+        params.value = ""
+      })
+
+      function addToScene(item) {
+        scene.push(item)
+        printScene()
+      }
+
+      function printScene() {
+        let output = document.getElementById("sceneElements")
+        let outString = ""
+        scene.forEach((item, i) => {
+          if (outString.length > 0) {outString += "<br>"}
+          outString += "Item " + i + " : " + item.type + ", " + item.params
+        })
+        output.innerHTML = `<p>${outString}</p>`
+      }
+
+      document.getElementById("sendScene").addEventListener("click", () => {
+        socket.emit("clientSendScene", scene)
+        console.log("Sending scene with " + scene.length + " objects")
+      })
+   </script>
+</html>

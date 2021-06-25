@@ -15,6 +15,10 @@ app.get('/obs', (req, res) => {
   res.sendFile(__dirname + '/obs.html');
 });
 
+app.get('/test', (req, res) => {
+  res.sendFile(__dirname + '/test.html');
+});
+
 io.on('connection', (socket) => {
 
   if (serverFirstRun) {
@@ -22,6 +26,10 @@ io.on('connection', (socket) => {
       io.emit('serverFirstRun', files)
     })
   }
+
+  socket.on("clientSendScene", (data) => {
+    io.emit("obsDisplay", data)
+  })
 
   socket.on('chooseCollection', (name) => {
     collectionName = name

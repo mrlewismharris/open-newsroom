@@ -4,8 +4,9 @@
       <title>Hello</title>
       <script src = "/socket.io/socket.io.js"></script>
       <style>
-        body {margin:0}
+        body {margin:0;overflow:hidden}
         #mainContainer {width:1920px;height:1080px;}
+        .onscreenElement {position:absolute;}
       </style>
       <script>const socket = io();</script>
    </head>
@@ -18,6 +19,19 @@
         screen.innerHTML = "";
         console.log(data);
         //screen.append(data);
+      })
+
+      socket.on("obsDisplay", (data) => {
+        let main = document.getElementById("mainContainer")
+        main.innerHTML = ""
+        if (data.length == 0) return
+        data.forEach(el => {
+          let element = document.createElement(el.type)
+          element.className = "onscreenElement"
+          element.style = el.params
+          console.log(element)
+          main.appendChild(element)
+        })
       })
 
     </script>
