@@ -1,7 +1,7 @@
 {
-  "name": "socketio-express",
-  "version": "1.0.0",
-  "description": "",
+  "name": "open-newsroom",
+  "version": "0.0.0",
+  "description": "An advanced layout creation tool for creating and cueing professional prefabbed layouts",
   "main": "server.js",
   "scripts": {
     "watch": "nodemon server.js",
