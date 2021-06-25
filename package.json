@@ -1,6 +1,6 @@
 {
   "name": "open-newsroom",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "An advanced layout creation tool for creating and cueing professional prefabbed layouts",
   "main": "server.js",
   "scripts": {
