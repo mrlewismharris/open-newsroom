@@ -6,10 +6,41 @@ const fs = require('fs');
 let sceneCollection = [];
 let serverFirstRun = true;
 let collectionName = "";
+let ini;
+
+fs.access("settings.ini", fs.F_OK, (err) => {
+  if (err) {
+    //wizard will go here, trigger when no settings.ini
+    //for now, just create empty
+    fs.writeFile("settings.ini", "{}", (err) => {
+      if (err) return
+    })
+    fs.readFile("settings.ini", (err, data) => {
+      if (err) return
+      console.log("No settings.ini file found - created one (placeholder)")
+      ini = JSON.parse(data)
+    })
+  } else {
+    fs.readFile("settings.ini", (err, data) => {
+      if (err) return
+      ini = JSON.parse(data)
+    })
+  }
+})
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
+
+//get all js files from directory
+app.get('/js/:file', (req,res) => {
+  res.sendFile(`${__dirname}/js/${req.params.file}`)
+})
+
+//get all css files from directory
+app.get('/css/:file', (req,res) => {
+  res.sendFile(`${__dirname}/css/${req.params.file}`)
+})
 
 app.get('/obs', (req, res) => {
   res.sendFile(__dirname + '/obs.html');
@@ -20,6 +51,8 @@ app.get('/test', (req, res) => {
 });
 
 io.on('connection', (socket) => {
+
+  socket.emit('iniFile', ini)
 
   if (serverFirstRun) {
     fs.readdir('fs/collections', (err, files) => {

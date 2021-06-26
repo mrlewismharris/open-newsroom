@@ -1,11 +1,26 @@
 <!DOCTYPE html>
 <html>
    <head>
-      <title>Hello</title>
+      <title>Test OpenNewsroom</title>
       <meta charset="UTF-8">
       <script src = "/socket.io/socket.io.js"></script>
+      <!-- RUN FIRST -->
+      <script>const socket = io();let ini;</script>
+      <script src = "/js/global.js"></script>
+      <script src = "/js/prefabCanvas.js"></script>
+      <link rel="stylesheet" href="/css/main.css">
+      <link rel="stylesheet" href="/css/prefabCanvas.css">
+      <style>
+        body {margin:0}
+        .foreground {width:100%;height:100%;z-index:1000;position:absolute;top:0px;left:0px}
+        .hidden {display:none}
+      </style>
     </head>
-      <h3>Add New Element to Scene</h3>
+    <body>
+      <div class="foreground hidden" id="foreground"></div>
+      <h3>Canvas Add New Element to Scene</h3>
+      <button id="openCanvas">Add With Canvas</button>
+      <h3>Manual Add New Element to Scene</h3>
       Element:
       <select id="elementType">
         <option>p</option>
@@ -18,38 +33,44 @@
       <h3>Scene</h3>
       <div id="sceneElements"></div>
       <button id="sendScene">Send Elements</button>
-    <script>
-      const socket = io()
-      const scene = [];
-      document.getElementById("htmlSendUpdate").addEventListener("click", () => {
-        let type = document.getElementById("elementType")
-        let params = document.getElementById("elementParams")
-        let content = document.getElementById("elementContent")
-        if (type.value == "" || params.value == "") return
-        addToScene({"type": type.value, "params": params.value, "content": content.value})
-        type.value = "p"
-        params.value = ""
-        content.value = ""
-      })
-
-      function addToScene(item) {
-        scene.push(item)
-        printScene()
-      }
-
-      function printScene() {
-        let output = document.getElementById("sceneElements")
-        let outString = ""
-        scene.forEach((item, i) => {
-          if (outString.length > 0) {outString += "<br>"}
-          outString += `Item ${i} : ${item.type}, ${item.params} , ${item.content}`
+      <script>
+        let scene = [];
+        document.getElementById("htmlSendUpdate").addEventListener("click", () => {
+          let type = document.getElementById("elementType")
+          let params = document.getElementById("elementParams")
+          let content = document.getElementById("elementContent")
+          if (type.value == "" || params.value == "") return
+          addToScene({"type": type.value, "params": params.value, "content": content.value})
+          type.value = "p"
+          params.value = ""
+          content.value = ""
         })
-        output.innerHTML = `<p>${outString}</p>`
-      }
 
-      document.getElementById("sendScene").addEventListener("click", () => {
-        socket.emit("clientSendScene", scene)
-        console.log("Sending scene with " + scene.length + " objects")
-      })
-   </script>
+        function addToScene(item) {
+          scene.push(item)
+          printScene()
+        }
+
+        document.getElementById("openCanvas").addEventListener("click", () => {
+          let contain = document.getElementById("foreground")
+          let temp = new prefabCanvas(contain)
+          contain.classList.remove("hidden")
+        })
+
+        function printScene() {
+          let output = document.getElementById("sceneElements")
+          let outString = ""
+          scene.forEach((item, i) => {
+            if (outString.length > 0) {outString += "<br>"}
+            outString += `Item ${i} : ${item.type}, ${item.params} , ${item.content}`
+          })
+          output.innerHTML = `<p>${outString}</p>`
+        }
+
+        document.getElementById("sendScene").addEventListener("click", () => {
+          socket.emit("clientSendScene", scene)
+          console.log("Sending scene with " + scene.length + " objects")
+        })
+    </script>
+   </body>
 </html>
