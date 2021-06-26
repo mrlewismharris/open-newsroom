@@ -44,16 +44,13 @@ class prefabCanvas {
 
   resize(style) {
 
+    let container = this.parent.children[0].children[1]
     let canvas = this.parent.children[0].children[1].children[0]
-    //TODO START FROM HERE :
-      //Add totalWidth which will get the width of the inner window
-      //Then use the "fit" case to scale the element properly
-      //figure out why the scaling is not working properly haha
-    //let totalWidth = ...
 
     switch(style) {
       case "fit":
-          canvas.style.transform = "scale(1)"
+          canvas.style.transform = "scale(0.3)"
+          this.center()
         break;
       case "actual":
 
@@ -61,4 +58,20 @@ class prefabCanvas {
     }
   }
 
+  center() {
+    //exactly center IF the scrollbars are 17 pixels, which there aren't on all browsers
+    let container = this.parent.children[0]
+    let canvas = this.parent.children[0].children[1].children[0]
+    let scale = 1
+    if (canvas.style.transform) {
+      scale = canvas.style.transform.split("(")[1].split(")")[0]
+    }
+    //needs to have a setTimeout IDK WHY!!!
+    setTimeout(() => {
+      window.scroll(
+        (container.clientWidth/2-((canvas.clientWidth*scale)/2))-((window.innerWidth - canvas.clientWidth*scale)/2)+8.5,
+        (container.clientHeight/2-((canvas.clientHeight*scale)/2))-((window.innerHeight - canvas.clientHeight*scale)/2)+8.5
+      )
+    }, 1)
+  }
 }
