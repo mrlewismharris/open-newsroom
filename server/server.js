@@ -57,8 +57,6 @@ app.get('/test', (req, res) => {
 
 io.on('connect', (socket) => {
 
-  console.log("user connected")
-
   socket.emit('iniFile', ini)
 
   if (serverFirstRun) {

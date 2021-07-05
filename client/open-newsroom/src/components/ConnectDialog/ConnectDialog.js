@@ -1,4 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, CircularProgress } from "@material-ui/core";
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, CircularProgress, FormControl } from "@material-ui/core";
 import WifiIcon from '@material-ui/icons/Wifi';
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
@@ -7,25 +7,40 @@ export default function ConnectDialog(props) {
 
   const [address, setAddress] = useState("http://localhost:3001")
   const [connectIcon, setConnectIcon] = useState(<WifiIcon/>)
+  const [connectionError, setConnectionError] = useState(false)
 
   const connectHandle = () => {
     setConnectIcon(<CircularProgress disableShrink style={{color: '#00C853'}} size={20} thickness={7} />)
+    setConnectionError(false)
 
-    //start again here!
-    const socket = io(address)
+    const socket = io(address, {
+      reconnection: false,
+      timeout: 1500
+    })
 
-    if (false) {
+    socket.on("connect", () => {
+      localStorage.setItem("lastSuccessfulAddress", address)
       props.onClose(address)
-    } else {
-      setTimeout(() => {
-        setConnectIcon(<WifiIcon/>)
-      }, 500)
-    }
+    });
+
+    socket.io.on("error", () => {
+      setConnectIcon(<WifiIcon/>)
+      setConnectionError(true)
+    });
+
   }
 
   useEffect(() => {
-    //connectHandle()
-  })
+    if (localStorage.getItem("lastSuccessfulAddress") === null) {
+      localStorage.setItem("lastSuccessfulAddress", "")
+    }
+  
+    if (localStorage.getItem("lastSuccessfulAddress") !== "") {
+      setAddress(localStorage.getItem("lastSuccessfulAddress"))
+    }
+
+    connectHandle()
+  }, [])
 
   return (
     <Dialog 
@@ -36,9 +51,22 @@ export default function ConnectDialog(props) {
       <DialogTitle id="serverConnectDialogTitle">Connect to Server</DialogTitle>
       <DialogContent>
         <DialogContentText id="serverConnectDialogDescription">
-          <form noValidate autoComplete="off">
-            <TextField required id="standard-required" label="Server Address" defaultValue="http://localhost:3001" onChange={(e) => setAddress(e.target.value)} size="medium" autoFocus/>
-          </form>
+          <FormControl>
+            <TextField required 
+              id="standard-required" 
+              label="Server Address" 
+              defaultValue={address}
+              onClick={() => setConnectionError(false)}
+              onChange={(e) => {
+                setConnectionError(false)
+                setAddress(e.target.value)
+              }}
+              size="medium"
+              error={connectionError}
+              helperText={connectionError?"Connection Error":""}
+              autoFocus
+            />
+          </FormControl>
         </DialogContentText>
       </DialogContent>
       <DialogActions>
