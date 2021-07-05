@@ -1,0 +1,12 @@
+.MuiDialogContent-root {
+  height: 64px;
+  overflow: hidden
+}
+
+.serverAddressField {
+  width: 260px
+}
+
+.MuiDialogTitle-root {
+  text-align: center
+}

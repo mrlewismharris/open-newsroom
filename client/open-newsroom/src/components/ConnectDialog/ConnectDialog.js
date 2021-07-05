@@ -1,7 +1,8 @@
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, CircularProgress, FormControl } from "@material-ui/core";
 import WifiIcon from '@material-ui/icons/Wifi';
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import './ConnectDialog.css'
 
 export default function ConnectDialog(props) {
 
@@ -9,7 +10,7 @@ export default function ConnectDialog(props) {
   const [connectIcon, setConnectIcon] = useState(<WifiIcon/>)
   const [connectionError, setConnectionError] = useState(false)
 
-  const connectHandle = () => {
+  const connectHandle = useCallback(() => {
     setConnectIcon(<CircularProgress disableShrink style={{color: '#00C853'}} size={20} thickness={7} />)
     setConnectionError(false)
 
@@ -27,8 +28,7 @@ export default function ConnectDialog(props) {
       setConnectIcon(<WifiIcon/>)
       setConnectionError(true)
     });
-
-  }
+  }, [props, address])
 
   useEffect(() => {
     if (localStorage.getItem("lastSuccessfulAddress") === null) {
@@ -40,7 +40,7 @@ export default function ConnectDialog(props) {
     }
 
     connectHandle()
-  }, [])
+  }, [connectHandle])
 
   return (
     <Dialog 
@@ -64,6 +64,7 @@ export default function ConnectDialog(props) {
               size="medium"
               error={connectionError}
               helperText={connectionError?"Connection Error":""}
+              className="serverAddressField"
               autoFocus
             />
           </FormControl>

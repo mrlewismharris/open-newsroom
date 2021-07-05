@@ -5,6 +5,7 @@ import MainAppbar from 'components/MainAppbar/MainAppbar';
 import MainDrawer from 'components/MainDrawer/MainDrawer';
 import MainTheme from 'components/Themes/MainTheme';
 import React, { useState } from 'react';
+import { io } from 'socket.io-client';
 import './App.css';
 
 function App() {
@@ -28,7 +29,10 @@ function App() {
 
   const setServerHandle = (address) => {
     setServerConnectState(address)
-    console.log(address)
+    const socket = io(address)
+    socket.on('disconnect', () => {
+      setServerConnectState("")
+    })
   }
 
   return (
