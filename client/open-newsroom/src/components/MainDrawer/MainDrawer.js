@@ -3,6 +3,7 @@ import { List, ListItem, ListItemIcon, ListItemText, Divider, Drawer } from '@ma
 import HomeIcon from '@material-ui/icons/Home';
 import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import { makeStyles } from '@material-ui/core/styles';
+import './MainDrawer.css'
 
 const useStyles = makeStyles({
   list: {
@@ -26,7 +27,7 @@ export default function MainDrawer(props) {
         onClick= { props.onClose }
       >
         <List>
-          <ListItem button key="Dummy Button">
+          <ListItem className="drawerButton" button key="Dummy Button">
             <ListItemIcon>
               <HomeIcon style={{fill: '#ddd'}} />
             </ListItemIcon>
@@ -35,7 +36,7 @@ export default function MainDrawer(props) {
         </List>
         <Divider />
         <List>
-          <ListItem button key="Open Dialog" onClick={ props.openDialog }>
+          <ListItem className="drawerButton" button key="Open Dialog" onClick={ props.openDialog }>
             <ListItemIcon>
               <OpenInNewIcon style={{fill: '#ddd'}} />
             </ListItemIcon>
