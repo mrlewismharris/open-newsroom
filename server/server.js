@@ -1,6 +1,11 @@
 const app = require('express')();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+//const http = require('http').Server(app);
+const io = require('socket.io')(3001, {
+  cors: {
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+  },
+});
 const fs = require('fs');
 
 let sceneCollection = [];
@@ -50,7 +55,9 @@ app.get('/test', (req, res) => {
   res.sendFile(__dirname + '/test.html');
 });
 
-io.on('connection', (socket) => {
+io.on('connect', (socket) => {
+
+  console.log("user connected")
 
   socket.emit('iniFile', ini)
 
@@ -106,6 +113,8 @@ io.on('connection', (socket) => {
 
 });
 
-http.listen(3000, () => {
-   console.log('listening on *:3000');
+/*
+http.listen(3001, () => {
+   console.log('listening on *:3001');
 });
+*/

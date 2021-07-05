@@ -1,4 +1,5 @@
 import { Button, MenuItem, ThemeProvider } from '@material-ui/core';
+import ConnectDialog from 'components/ConnectDialog/ConnectDialog';
 import ContextMenu from 'components/ContextMenu/ContextMenu';
 import MainAppbar from 'components/MainAppbar/MainAppbar';
 import MainDrawer from 'components/MainDrawer/MainDrawer';
@@ -7,6 +8,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+  const [ServerConnectState, setServerConnectState] = useState("");
   const [MainDrawerState, setMainDrawerState] = useState(false);
   const [DialogMenuState, setDialogMenuState] = useState({x: null, y: null});
   const [DialogMenuContents, setDialogMenuContents] = useState(null);
@@ -24,8 +26,14 @@ function App() {
     setDialogMenuState({x: null, y: null})
   }
 
+  const setServerHandle = (address) => {
+    setServerConnectState(address)
+    console.log(address)
+  }
+
   return (
     <ThemeProvider theme={ MainTheme.c222 }>
+      <ConnectDialog open={ServerConnectState!==""?false:true} onClose={setServerHandle} />
       <MainAppbar title="Open Newsroom for OBS" openDrawer={ () => setMainDrawerState(true) }>
         <Button 
           onContextMenu={(e) => contextHandle(e, [
