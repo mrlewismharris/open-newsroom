@@ -3,6 +3,7 @@ import ConnectDialog from 'components/ConnectDialog/ConnectDialog';
 import ContextMenu from 'components/ContextMenu/ContextMenu';
 import MainAppbar from 'components/MainAppbar/MainAppbar';
 import MainDrawer from 'components/MainDrawer/MainDrawer';
+import PrefabEditor from 'components/PrefabEditor/PrefabEditor';
 import MainTheme from 'components/Themes/MainTheme';
 import React, { useState } from 'react';
 import { io } from 'socket.io-client';
@@ -13,6 +14,7 @@ function App() {
   const [MainDrawerState, setMainDrawerState] = useState(false);
   const [DialogMenuState, setDialogMenuState] = useState({x: null, y: null});
   const [DialogMenuContents, setDialogMenuContents] = useState(null);
+  const [PrefabEditorOpen, setPrefabEditorOpen] = useState(false);
 
   const contextHandle = (e, content) => {
     e.preventDefault();
@@ -41,16 +43,15 @@ function App() {
       <MainAppbar title="Open Newsroom for OBS" openDrawer={ () => setMainDrawerState(true) }>
         <Button 
           onContextMenu={(e) => contextHandle(e, [
-            <MenuItem key="1" onClick={contextHandleClose}>Appbar</MenuItem>,
-            <MenuItem key="2" onClick={contextHandleClose}>Appbar</MenuItem>,
+            <MenuItem key="1" onClick={() => setPrefabEditorOpen(true)}>Fullscreen Dialog</MenuItem>,
           ])}
           variant='contained'
           color='secondary'
-        >Login</Button>
+        >Test Stuff</Button>
       </MainAppbar>
 
+      {/* Hidden elements go here */}
       <MainDrawer open={ MainDrawerState } onClose={ () => setMainDrawerState(false) } contextHandler={contextHandle}/>
-
       <ContextMenu 
         open={DialogMenuState.y !== null && DialogMenuContents !== null}
         onClose={contextHandleClose}
@@ -60,6 +61,7 @@ function App() {
           ? { top: DialogMenuState.y, left: DialogMenuState.x } : undefined
         }
       />
+      <PrefabEditor open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)}/>
 
     </ThemeProvider>
   );

@@ -8,6 +8,7 @@ export default function ContextMenu(props) {
       keepMounted
       open={props.open}
       onClose={props.onClose}
+      onClick={props.onClose}
       anchorReference="anchorPosition"
       anchorPosition={props.anchorPosition}
     >
