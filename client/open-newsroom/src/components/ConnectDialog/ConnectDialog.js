@@ -1,6 +1,6 @@
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, TextField, CircularProgress } from "@material-ui/core";
 import WifiIcon from '@material-ui/icons/Wifi';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
 export default function ConnectDialog(props) {
@@ -9,20 +9,23 @@ export default function ConnectDialog(props) {
   const [connectIcon, setConnectIcon] = useState(<WifiIcon/>)
 
   const connectHandle = () => {
-    setConnectIcon(<CircularProgress disableShrink style={{color: '#00C853'}} size={20} thickness={6} />)
+    setConnectIcon(<CircularProgress disableShrink style={{color: '#00C853'}} size={20} thickness={7} />)
 
     //start again here!
     const socket = io(address)
-    if (socket.connected) console.log(socket)
 
     if (false) {
       props.onClose(address)
     } else {
       setTimeout(() => {
         setConnectIcon(<WifiIcon/>)
-      }, 200)
+      }, 500)
     }
   }
+
+  useEffect(() => {
+    //connectHandle()
+  })
 
   return (
     <Dialog 
