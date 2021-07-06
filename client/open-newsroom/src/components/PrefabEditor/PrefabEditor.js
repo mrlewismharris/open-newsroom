@@ -1,8 +1,9 @@
 import React, { useRef, useState } from "react";
-import { AppBar, Button, ClickAwayListener, Dialog, Grow, IconButton, MenuItem, MenuList, Paper, Popper, Slide, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Button, ClickAwayListener, Dialog, Drawer, Grow, IconButton, List, ListItem, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popper, Slide, Toolbar, Typography } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import './PrefabEditor.css';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import MailIcon from '@material-ui/icons/Mail';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -23,10 +24,32 @@ export default function PrefabEditor(props) {
         // @ts-ignore
         TransitionComponent={Transition}
       >
+
+        <Drawer
+          variant="permanent"
+          className="toolbarDrawer"
+        >
+          <List className="toolbarList">
+            <ListItem button key="Add">
+              <ListItemIcon>
+                <MailIcon style={{fill: "#ddd"}} /> 
+              </ListItemIcon>
+              <ListItemText />
+            </ListItem>
+            <ListItem button key="Add">
+              <ListItemIcon>
+                <MailIcon style={{fill: "#ddd"}} /> 
+              </ListItemIcon>
+              <ListItemText />
+            </ListItem>
+          </List>
+        </Drawer>
+
+
         <AppBar className="prefabEditorAppbar">
           <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={props.onClose} aria-label="close">
-                <CloseIcon />
+            <IconButton className="AppbarExit" edge="start" color="inherit" onClick={props.onClose} aria-label="close">
+              <CloseIcon />
             </IconButton>
             <Typography className="AppbarTitle" variant="h6">Prefab Editor</Typography>
             <Typography className="AppbarButton">Prefab Name</Typography>
@@ -60,9 +83,10 @@ export default function PrefabEditor(props) {
             <Button 
               variant='contained'
               color='secondary'
-            >Save</Button>
+            >Add to Timeline</Button>
           </Toolbar>
         </AppBar>
+
         {/*  Dialog elements go here  */}
       </Dialog>
     </div>

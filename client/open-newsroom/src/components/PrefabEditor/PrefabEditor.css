@@ -13,3 +13,21 @@
 .AppbarExit {
   margin-right: 10px!important;
 }
+
+.toolbarDrawer {
+  z-index: 10!important;
+}
+
+.MuiDrawer-paper {
+  background-color: #222!important;
+}
+
+.toolbarList {
+  max-width: 46px;
+  overflow: hidden;
+  top: 63px!important;
+}
+
+.MuiListItem-button {
+  padding: 8px 11px!important;
+}
