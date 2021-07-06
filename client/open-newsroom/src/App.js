@@ -61,7 +61,7 @@ function App() {
           ? { top: DialogMenuState.y, left: DialogMenuState.x } : undefined
         }
       />
-      <PrefabEditor open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)}/>
+      <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)}/>
 
     </ThemeProvider>
   );

@@ -1,0 +1,15 @@
+.MuiDialog-paperFullScreen {
+  background-color: #111!important;
+}
+
+.AppbarTitle {
+  flex-grow: 1
+}
+
+.AppbarButton {
+  margin-right: 15px!important;
+}
+
+.AppbarExit {
+  margin-right: 10px!important;
+}
