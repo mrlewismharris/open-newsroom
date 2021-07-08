@@ -70,9 +70,7 @@ function handleNewPrefab() {
     let uniqueName = true;
     //Check unique name here
     if (uniqueName) {
-      props.setPrefabName(inputPrefabName)
-      props.setCanvasInfo({width: inputWidth, height: inputHeight})
-      props.newPrefab()
+      props.newPrefab(inputPrefabName, parseInt(inputWidth), parseInt(inputHeight))
       handleClose()
     } else {
       setPrefabNameError("Prefab name already exists")

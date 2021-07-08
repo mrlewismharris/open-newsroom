@@ -21,8 +21,9 @@ export default function PrefabEditor(props) {
   const [thisPrefabName, setThisPrefabName] = useState("")
   const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0})
 
-  function createNewPrefab() {
-    console.log(`New Prefab created: "${thisPrefabName}"`, editorCanvasInfo)
+  function createNewPrefab(newName, newWidth, newHeight) {
+    setThisPrefabName(newName)
+    console.log(`New Prefab created: "${newName}"`, newWidth, newHeight)
   }
 
   return (
@@ -119,7 +120,7 @@ export default function PrefabEditor(props) {
           </Toolbar>
         </AppBar>
 
-        <NewPrefabDialog open={newPrefabDialog} placeholderHeight={props.canvasInfo.height} placeholderWidth={props.canvasInfo.width} onClose={() => setNewPrefabDialog(false)} setPrefabName={setThisPrefabName} setCanvasInfo={setEditorCanvasInfo} newPrefab={createNewPrefab} />
+        <NewPrefabDialog open={newPrefabDialog} placeholderHeight={props.canvasInfo.height} placeholderWidth={props.canvasInfo.width} onClose={() => setNewPrefabDialog(false)} setCanvasInfo={setEditorCanvasInfo} newPrefab={createNewPrefab} />
 
         {/*  Dialog elements go here  */}
       </Dialog>
