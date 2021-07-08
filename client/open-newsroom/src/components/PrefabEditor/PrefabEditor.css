@@ -31,3 +31,11 @@
 .MuiListItem-button {
   padding: 8px 11px!important;
 }
+
+.createRefabDialogContent {
+  height: auto;
+}
+
+.prefabSize {
+  width: 275px!important
+}

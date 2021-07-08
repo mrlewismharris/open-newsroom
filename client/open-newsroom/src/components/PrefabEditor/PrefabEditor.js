@@ -3,7 +3,8 @@ import { AppBar, Button, ClickAwayListener, Dialog, Drawer, Grow, IconButton, Li
 import CloseIcon from '@material-ui/icons/Close';
 import './PrefabEditor.css';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import MailIcon from '@material-ui/icons/Mail';
+import AddIcon from '@material-ui/icons/Add';
+import NewPrefabDialog from "./NewPrefabDialog";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -11,8 +12,18 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function PrefabEditor(props) {
-  const anchorRef = useRef(null)
-  const [contextOpen, setContextOpen] = useState(false)
+  const anchorRef_File = useRef(null)
+  const anchorRef_Edit = useRef(null)
+  const [fileContextOpen, setFileContextOpen] = useState(false)
+  const [editContextOpen, setEditContextOpen] = useState(false)
+  const [newPrefabDialog, setNewPrefabDialog] = useState(false)
+
+  const [thisPrefabName, setThisPrefabName] = useState("")
+  const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0})
+
+  function createNewPrefab() {
+    console.log(`New Prefab created: "${thisPrefabName}"`, editorCanvasInfo)
+  }
 
   return (
     <div>
@@ -27,18 +38,13 @@ export default function PrefabEditor(props) {
 
         <Drawer
           variant="permanent"
+          open={true}
           className="toolbarDrawer"
         >
           <List className="toolbarList">
             <ListItem button key="Add">
               <ListItemIcon>
-                <MailIcon style={{fill: "#ddd"}} /> 
-              </ListItemIcon>
-              <ListItemText />
-            </ListItem>
-            <ListItem button key="Add">
-              <ListItemIcon>
-                <MailIcon style={{fill: "#ddd"}} /> 
+                <AddIcon style={{fill: "#ddd"}} /> 
               </ListItemIcon>
               <ListItemText />
             </ListItem>
@@ -52,40 +58,68 @@ export default function PrefabEditor(props) {
               <CloseIcon />
             </IconButton>
             <Typography className="AppbarTitle" variant="h6">Prefab Editor</Typography>
-            <Typography className="AppbarButton">Prefab Name</Typography>
+            <Typography className="AppbarButton">{thisPrefabName}</Typography>
             <Button
-              ref={anchorRef}
+              ref={anchorRef_File}
               variant="contained"
               color="secondary"
               className="AppbarButton"
               endIcon={<ArrowDropDownIcon/>}
-              onClick={() => setContextOpen(true)}
-            >Edit</Button>
-            <Popper open={contextOpen} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+              onClick={() => setFileContextOpen(true)}
+            >File</Button>
+            <Popper open={fileContextOpen} anchorEl={anchorRef_File.current} role={undefined} transition disablePortal>
               {({ TransitionProps, placement }) => (
                 <Grow
                   {...TransitionProps}
                   style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
                 >
                   <Paper>
-                    <ClickAwayListener onClickAway={() => setContextOpen(false)}>
-                      <MenuList autoFocusItem={contextOpen} id="menu-list-grow">
-                        <MenuItem onClick={() => setContextOpen(false)}>New</MenuItem>
-                        <MenuItem onClick={() => setContextOpen(false)}>Open</MenuItem>
-                        <MenuItem onClick={() => setContextOpen(false)}>Duplicate</MenuItem>
-                        <MenuItem onClick={() => setContextOpen(false)}>Move to Bin</MenuItem>
+                    <ClickAwayListener onClickAway={() => setFileContextOpen(false)}>
+                      <MenuList autoFocusItem={fileContextOpen} id="menu-list-grow">
+                        <MenuItem onClick={() => {setFileContextOpen(false);setNewPrefabDialog(true)}}>New</MenuItem>
+                        <MenuItem onClick={() => setFileContextOpen(false)}>Open</MenuItem>
+                        <MenuItem onClick={() => setFileContextOpen(false)}>Duplicate</MenuItem>
+                        <MenuItem onClick={() => setFileContextOpen(false)}>Move to Bin</MenuItem>
                       </MenuList>
                     </ClickAwayListener>
                   </Paper>
                 </Grow>
               )}
             </Popper>
+
+            <Button
+              ref={anchorRef_Edit}
+              variant="contained"
+              color="secondary"
+              className="AppbarButton"
+              endIcon={<ArrowDropDownIcon/>}
+              onClick={() => setEditContextOpen(true)}
+            >Edit</Button>
+            <Popper open={editContextOpen} anchorEl={anchorRef_Edit.current} role={undefined} transition disablePortal>
+              {({ TransitionProps, placement }) => (
+                <Grow
+                  {...TransitionProps}
+                  style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                >
+                  <Paper>
+                    <ClickAwayListener onClickAway={() => setEditContextOpen(false)}>
+                      <MenuList autoFocusItem={editContextOpen} id="menu-list-grow">
+                        <MenuItem onClick={() => setEditContextOpen(false)}>Change Size</MenuItem>
+                      </MenuList>
+                    </ClickAwayListener>
+                  </Paper>
+                </Grow>
+              )}
+            </Popper>
+
             <Button 
               variant='contained'
               color='secondary'
             >Add to Timeline</Button>
           </Toolbar>
         </AppBar>
+
+        <NewPrefabDialog open={newPrefabDialog} placeholderHeight={props.canvasInfo.height} placeholderWidth={props.canvasInfo.width} onClose={() => setNewPrefabDialog(false)} setPrefabName={setThisPrefabName} setCanvasInfo={setEditorCanvasInfo} newPrefab={createNewPrefab} />
 
         {/*  Dialog elements go here  */}
       </Dialog>
