@@ -39,3 +39,7 @@
 .prefabSize {
   width: 275px!important
 }
+
+.editingCanvas {
+  background: #fff
+}

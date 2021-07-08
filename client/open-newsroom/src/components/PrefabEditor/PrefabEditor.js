@@ -5,6 +5,7 @@ import './PrefabEditor.css';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import AddIcon from '@material-ui/icons/Add';
 import NewPrefabDialog from "./NewPrefabDialog";
+import Canvas from "./Canvas";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -14,6 +15,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function PrefabEditor(props) {
   const anchorRef_File = useRef(null)
   const anchorRef_Edit = useRef(null)
+
+  const [prefabOpen, setPrefabOpen] = useState(false)
+
   const [fileContextOpen, setFileContextOpen] = useState(false)
   const [editContextOpen, setEditContextOpen] = useState(false)
   const [newPrefabDialog, setNewPrefabDialog] = useState(false)
@@ -22,8 +26,17 @@ export default function PrefabEditor(props) {
   const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0})
 
   function createNewPrefab(newName, newWidth, newHeight) {
+    setPrefabOpen(true)
     setThisPrefabName(newName)
+    setEditorCanvasInfo({width: newWidth, height: newHeight})
     console.log(`New Prefab created: "${newName}"`, newWidth, newHeight)
+  }
+
+  function closePrefabEditor() {
+    setPrefabOpen(false)
+    setThisPrefabName("")
+    setEditorCanvasInfo({width: 0, height: 0})
+    props.onClose()
   }
 
   return (
@@ -32,14 +45,14 @@ export default function PrefabEditor(props) {
         fullScreen
         className="PrefabEditor"
         open={props.open}
-        onClose={props.onClose}
+        onClose={closePrefabEditor}
         // @ts-ignore
         TransitionComponent={Transition}
       >
 
         <Drawer
-          variant="permanent"
-          open={true}
+          variant="persistent"
+          open={prefabOpen}
           className="toolbarDrawer"
         >
           <List className="toolbarList">
@@ -55,7 +68,7 @@ export default function PrefabEditor(props) {
 
         <AppBar className="prefabEditorAppbar">
           <Toolbar>
-            <IconButton className="AppbarExit" edge="start" color="inherit" onClick={props.onClose} aria-label="close">
+            <IconButton className="AppbarExit" edge="start" color="inherit" onClick={closePrefabEditor} aria-label="close">
               <CloseIcon />
             </IconButton>
             <Typography className="AppbarTitle" variant="h6">Prefab Editor</Typography>
@@ -123,6 +136,12 @@ export default function PrefabEditor(props) {
         <NewPrefabDialog open={newPrefabDialog} placeholderHeight={props.canvasInfo.height} placeholderWidth={props.canvasInfo.width} onClose={() => setNewPrefabDialog(false)} setCanvasInfo={setEditorCanvasInfo} newPrefab={createNewPrefab} />
 
         {/*  Dialog elements go here  */}
+        <Canvas
+          open={prefabOpen}
+          width={editorCanvasInfo.width}
+          height={editorCanvasInfo.height}
+        />
+
       </Dialog>
     </div>
   );
