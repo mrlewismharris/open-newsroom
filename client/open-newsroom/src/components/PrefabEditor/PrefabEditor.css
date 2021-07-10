@@ -1,45 +1,25 @@
-.MuiDialog-paperFullScreen {
-  background-color: #111!important;
-}
+.MuiDialog-paperFullScreen { background-color: #111!important; }
 
-.AppbarTitle {
-  flex-grow: 1
-}
+.AppbarTitle { flex-grow: 1; }
 
-.AppbarButton {
-  margin-right: 15px!important;
-}
+.AppbarButton { margin-right: 15px!important; }
 
-.AppbarExit {
-  margin-right: 10px!important;
-}
+.AppbarExit { margin-right: 10px!important; }
 
-.toolbarDrawer {
-  z-index: 10!important;
-}
+.toolbarDrawer { z-index: 10!important; }
 
-.MuiDrawer-paper {
-  background-color: #222!important;
-}
+.MuiDrawer-paper { background-color: #222!important; }
 
-.toolbarList {
-  max-width: 46px;
-  overflow: hidden;
-  top: 63px!important;
-}
+.toolbarList { max-width: 46px; overflow: hidden; top: 63px!important; }
 
-.MuiListItem-button {
-  padding: 8px 11px!important;
-}
+.MuiListItem-button { padding: 8px 11px!important; }
 
-.createRefabDialogContent {
-  height: auto;
-}
+.createRefabDialogContent { height: auto; }
 
-.prefabSize {
-  width: 275px!important
-}
+.prefabSize { width: 275px!important }
 
-.editingCanvas {
-  background: #fff
-}
+.editingCanvas { background: #fff; }
+
+.canvasContainer { overflow: hidden; padding: 0!important; max-width: 99999px!important; max-height: 99999px!important; }
+
+.canvasInnerContainer { box-sizing: border-box; padding: 64px 0 0 47px; }

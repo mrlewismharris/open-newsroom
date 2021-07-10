@@ -6,6 +6,7 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import AddIcon from '@material-ui/icons/Add';
 import NewPrefabDialog from "./NewPrefabDialog";
 import Canvas from "./Canvas";
+import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -23,19 +24,21 @@ export default function PrefabEditor(props) {
   const [newPrefabDialog, setNewPrefabDialog] = useState(false)
 
   const [thisPrefabName, setThisPrefabName] = useState("")
-  const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0})
+  const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0, zoom: 0.4})
+
+  const [refreshCanvasCentre, doRefreshCanvasCentre] = useState(0)
 
   function createNewPrefab(newName, newWidth, newHeight) {
     setPrefabOpen(true)
     setThisPrefabName(newName)
-    setEditorCanvasInfo({width: newWidth, height: newHeight})
+    setEditorCanvasInfo({width: newWidth, height: newHeight, zoom: 0.4})
     console.log(`New Prefab created: "${newName}"`, newWidth, newHeight)
   }
 
   function closePrefabEditor() {
     setPrefabOpen(false)
     setThisPrefabName("")
-    setEditorCanvasInfo({width: 0, height: 0})
+    setEditorCanvasInfo({width: 0, height: 0, zoom: 0.4})
     props.onClose()
   }
 
@@ -59,6 +62,12 @@ export default function PrefabEditor(props) {
             <ListItem button key="Add">
               <ListItemIcon>
                 <AddIcon style={{fill: "#ddd"}} /> 
+              </ListItemIcon>
+              <ListItemText />
+            </ListItem>
+            <ListItem button key="Center" onClick={() => {doRefreshCanvasCentre(refreshCanvasCentre+1)}}>
+              <ListItemIcon>
+                <CenterFocusStrongIcon style={{fill: "#ddd"}} /> 
               </ListItemIcon>
               <ListItemText />
             </ListItem>
@@ -138,8 +147,8 @@ export default function PrefabEditor(props) {
         {/*  Dialog elements go here  */}
         <Canvas
           open={prefabOpen}
-          width={editorCanvasInfo.width}
-          height={editorCanvasInfo.height}
+          canvasInfo={editorCanvasInfo}
+          recentre={refreshCanvasCentre}
         />
 
       </Dialog>

@@ -4,40 +4,57 @@ import './PrefabEditor.css'
 
 export default function Canvas(props) {
   const [canvasSize, setCanvasSize] = useState({width: 0, height: 0})
-  const [zoom, setZoom] = useState(0.4)
+  const [canvasPos, setCanvasPos] = useState({top: 0, left: 0})
+  const [zoom, setZoom] = useState(props.canvasInfo.zoom)
   
   function centerCanvas() {
-    //exactly center IF the scrollbars are 17 pixels, which there aren't on all browsers
-    let container = this.parent.children[0]
-    let canvas = this.parent.children[0].children[1].children[0]
-    let scale = 1
-    if (canvas.style.transform) {
-      scale = canvas.style.transform.split("(")[1].split(")")[0]
-    }
-    //needs to have a setTimeout IDK WHY!!!
-    setTimeout(() => {
-      window.scroll(
-        (container.clientWidth/2-((canvas.clientWidth*scale)/2))-((window.innerWidth - canvas.clientWidth*scale)/2)+8.5,
-        (container.clientHeight/2-((canvas.clientHeight*scale)/2))-((window.innerHeight - canvas.clientHeight*scale)/2)+8.5
-      )
-    }, 1)
+    window.scroll(
+      //(canvasSize.width/2)-((canvas.clientWidth*scale)/2)+8.5,
+      //(canvasSize.height/2-((canvas.clientHeight*scale)/2))-((window.innerHeight - canvas.clientHeight*scale)/2)+8.5
+    )
   }
 
-  useEffect(() => {
+  function calcCanvasSize() {
     setCanvasSize({
       width: window.innerWidth,
       height: window.innerHeight
     })
+    return ({width: window.innerWidth, height: window.innerHeight})
+  }
+
+  function calcCentre() {
+    let realCanvasSize = calcCanvasSize()
+    setCanvasPos({
+      top: ((realCanvasSize.height - 64) / 2) - ((props.canvasInfo.height * zoom) / 2) ,
+      left: ((realCanvasSize.width - 47) / 2) - ((props.canvasInfo.width * zoom) / 2)
+    })
+    console.log(realCanvasSize)
+  }
+
+  useEffect(() => {
+    calcCentre()
+  }, [props.recentre])
+
+  useEffect(() => {
+    calcCanvasSize()
   }, [])
 
   return (
     <Container className="canvasContainer">
-      <canvas
-        width={props.width}
-        height={props.height}
-        className="editingCanvas"
-        style={{transform: `scale(${zoom})`}}
-      ></canvas>
+      <div className="canvasInnerContainer">
+        <canvas
+          width={props.canvasInfo.width}
+          height={props.canvasInfo.height}
+          className="editingCanvas"
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: 'top left',
+            position: 'relative',
+            top: `${canvasPos.top}px`,
+            left: `${canvasPos.left}px`
+          }}
+        ></canvas>
+      </div>
     </Container>
   );
 }
