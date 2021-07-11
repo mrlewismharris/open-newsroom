@@ -30,11 +30,18 @@ export default function PrefabEditor(props) {
   const [refreshCanvasCentre, doRefreshCanvasCentre] = useState(0)
   const [canvasZoom, setCanvasZoom] = useState(0.4)
 
+  document.addEventListener('keydown', (e) => {
+    if (e.key=='e') {
+      console.log(e.key)
+    }
+  })
+
   function createNewPrefab(newName, newWidth, newHeight) {
     setPrefabOpen(true)
     setThisPrefabName(newName)
     setEditorCanvasInfo({width: newWidth, height: newHeight})
     doRefreshCanvasCentre(refreshCanvasCentre+1)
+    console.log(refreshCanvasCentre)
   }
 
   function closePrefabEditor() {

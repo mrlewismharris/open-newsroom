@@ -15,7 +15,6 @@ function App() {
   const [DialogMenuState, setDialogMenuState] = useState({x: null, y: null});
   const [DialogMenuContents, setDialogMenuContents] = useState(null);
   const [PrefabEditorOpen, setPrefabEditorOpen] = useState(false);
-  const [CanvasInfo, setCanvasInfo] = useState({width: 1920, height: 1080})
 
   const contextHandle = (e, content) => {
     e.preventDefault();
@@ -62,7 +61,7 @@ function App() {
           ? { top: DialogMenuState.y, left: DialogMenuState.x } : undefined
         }
       />
-      <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={CanvasInfo} />
+      <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={{width: 1920, height: 1080}} />
 
     </ThemeProvider>
   );

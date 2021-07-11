@@ -20,6 +20,6 @@
 
 .editingCanvas { background: #fff; }
 
-.canvasContainer { overflow: hidden; padding: 0!important; max-width: 99999px!important; max-height: 99999px!important; }
+.canvasContainer { overflow: hidden; padding: 64px 0 0 47px!important; }
 
-.canvasInnerContainer { box-sizing: border-box; padding: 64px 0 0 47px; }
+.canvasInnerContainer { box-sizing: border-box;}
