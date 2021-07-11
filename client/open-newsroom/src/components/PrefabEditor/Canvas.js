@@ -5,7 +5,7 @@ import './PrefabEditor.css'
 export default function Canvas(props) {
   const [canvasSize, setCanvasSize] = useState({width: 0, height: 0})
   const [canvasPos, setCanvasPos] = useState({top: 0, left: 0})
-  const [zoom, setZoom] = useState(props.canvasInfo.zoom)
+  const [zoom, setZoom] = useState(props.zoom)
   
   function centerCanvas() {
     window.scroll(
@@ -33,10 +33,15 @@ export default function Canvas(props) {
 
   useEffect(() => {
     calcCentre()
-  }, [props.recentre])
+  }, [props.recentre, calcCentre])
+
+  useEffect(() => {
+    setZoom(props.zoom)
+  }, [props.zoom])
 
   useEffect(() => {
     calcCanvasSize()
+    calcCentre()
   }, [])
 
   return (

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { AppBar, Button, ClickAwayListener, Dialog, Drawer, Grow, IconButton, List, ListItem, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popper, Slide, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Button, ClickAwayListener, Dialog, Drawer, Grow, IconButton, List, ListItem, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popper, Slide, Toolbar, Tooltip, Typography } from "@material-ui/core";
 import CloseIcon from '@material-ui/icons/Close';
 import './PrefabEditor.css';
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
@@ -7,6 +7,8 @@ import AddIcon from '@material-ui/icons/Add';
 import NewPrefabDialog from "./NewPrefabDialog";
 import Canvas from "./Canvas";
 import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong';
+import ZoomInIcon from '@material-ui/icons/ZoomIn';
+import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -24,21 +26,21 @@ export default function PrefabEditor(props) {
   const [newPrefabDialog, setNewPrefabDialog] = useState(false)
 
   const [thisPrefabName, setThisPrefabName] = useState("")
-  const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0, zoom: 0.4})
-
+  const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0})
   const [refreshCanvasCentre, doRefreshCanvasCentre] = useState(0)
+  const [canvasZoom, setCanvasZoom] = useState(0.4)
 
   function createNewPrefab(newName, newWidth, newHeight) {
     setPrefabOpen(true)
     setThisPrefabName(newName)
-    setEditorCanvasInfo({width: newWidth, height: newHeight, zoom: 0.4})
-    console.log(`New Prefab created: "${newName}"`, newWidth, newHeight)
+    setEditorCanvasInfo({width: newWidth, height: newHeight})
+    doRefreshCanvasCentre(refreshCanvasCentre+1)
   }
 
   function closePrefabEditor() {
     setPrefabOpen(false)
     setThisPrefabName("")
-    setEditorCanvasInfo({width: 0, height: 0, zoom: 0.4})
+    setEditorCanvasInfo({width: 0, height: 0})
     props.onClose()
   }
 
@@ -59,18 +61,38 @@ export default function PrefabEditor(props) {
           className="toolbarDrawer"
         >
           <List className="toolbarList">
-            <ListItem button key="Add">
-              <ListItemIcon>
-                <AddIcon style={{fill: "#ddd"}} /> 
-              </ListItemIcon>
-              <ListItemText />
-            </ListItem>
-            <ListItem button key="Center" onClick={() => {doRefreshCanvasCentre(refreshCanvasCentre+1)}}>
-              <ListItemIcon>
-                <CenterFocusStrongIcon style={{fill: "#ddd"}} /> 
-              </ListItemIcon>
-              <ListItemText />
-            </ListItem>
+            <Tooltip title="Add elements to prefab" style={{fontSize: 24}}>
+              <ListItem button key="Add">
+                <ListItemIcon>
+                  <AddIcon style={{fill: "#ddd"}} /> 
+                </ListItemIcon>
+                <ListItemText />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title="Centre the canvas">
+              <ListItem button key="Center" onClick={() => {doRefreshCanvasCentre(refreshCanvasCentre+1)}}>
+                <ListItemIcon>
+                  <CenterFocusStrongIcon style={{fill: "#ddd"}} /> 
+                </ListItemIcon>
+                <ListItemText />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title="Zoom in (+5%)">
+              <ListItem button key="ZoomIn" onClick={() => {setCanvasZoom(canvasZoom+0.05)}}>
+                <ListItemIcon>
+                  <ZoomInIcon style={{fill: "#ddd"}} /> 
+                </ListItemIcon>
+                <ListItemText />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title="Zoom out (-5%)">
+              <ListItem button key="ZoomOut" onClick={() => {setCanvasZoom(canvasZoom-0.05)}}>
+                <ListItemIcon>
+                  <ZoomOutIcon style={{fill: "#ddd"}} /> 
+                </ListItemIcon>
+                <ListItemText />
+              </ListItem>
+            </Tooltip>
           </List>
         </Drawer>
 
@@ -149,6 +171,7 @@ export default function PrefabEditor(props) {
           open={prefabOpen}
           canvasInfo={editorCanvasInfo}
           recentre={refreshCanvasCentre}
+          zoom={canvasZoom}
         />
 
       </Dialog>
