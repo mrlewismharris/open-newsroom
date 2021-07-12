@@ -20,6 +20,6 @@
 
 .editingCanvas { background: #fff; }
 
-.canvasContainer { overflow: hidden; padding: 64px 0 0 47px!important; }
+.canvasContainer { overflow: hidden!important; padding: 64px 0 0 47px!important; }
 
-.canvasInnerContainer { box-sizing: border-box;}
+.canvasInnerContainer { box-sizing: border-box; overflow: hidden!important}

@@ -12,7 +12,6 @@ export default function Canvas(props) {
       top: ((realCanvasSize.height - 64) / 2) - ((props.canvasInfo.height * zoom) / 2) ,
       left: ((realCanvasSize.width - 47) / 2) - ((props.canvasInfo.width * zoom) / 2)
     })
-    console.log(realCanvasSize)
   }, [zoom, props])
 
   useEffect(() => {

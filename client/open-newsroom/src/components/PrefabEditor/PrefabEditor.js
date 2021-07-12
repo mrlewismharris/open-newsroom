@@ -30,12 +30,6 @@ export default function PrefabEditor(props) {
   const [refreshCanvasCentre, doRefreshCanvasCentre] = useState(0)
   const [canvasZoom, setCanvasZoom] = useState(0.4)
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key=='e') {
-      console.log(e.key)
-    }
-  })
-
   function createNewPrefab(newName, newWidth, newHeight) {
     setPrefabOpen(true)
     setThisPrefabName(newName)
@@ -84,7 +78,7 @@ export default function PrefabEditor(props) {
                 <ListItemText />
               </ListItem>
             </Tooltip>
-            <Tooltip title="Zoom in (+5%)">
+            <Tooltip title="Zoom in">
               <ListItem button key="ZoomIn" onClick={() => {setCanvasZoom(canvasZoom+0.05)}}>
                 <ListItemIcon>
                   <ZoomInIcon style={{fill: "#ddd"}} /> 
@@ -92,7 +86,7 @@ export default function PrefabEditor(props) {
                 <ListItemText />
               </ListItem>
             </Tooltip>
-            <Tooltip title="Zoom out (-5%)">
+            <Tooltip title="Zoom out">
               <ListItem button key="ZoomOut" onClick={() => {setCanvasZoom(canvasZoom-0.05)}}>
                 <ListItemIcon>
                   <ZoomOutIcon style={{fill: "#ddd"}} /> 
