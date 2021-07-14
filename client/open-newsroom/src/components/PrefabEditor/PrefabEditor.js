@@ -9,6 +9,7 @@ import Canvas from "./Canvas";
 import CenterFocusStrongIcon from '@material-ui/icons/CenterFocusStrong';
 import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
+import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -29,6 +30,8 @@ export default function PrefabEditor(props) {
   const [editorCanvasInfo, setEditorCanvasInfo] = useState({width: 0, height: 0})
   const [refreshCanvasCentre, doRefreshCanvasCentre] = useState(0)
   const [canvasZoom, setCanvasZoom] = useState(0.4)
+
+
 
   function createNewPrefab(newName, newWidth, newHeight) {
     setPrefabOpen(true)
@@ -90,6 +93,23 @@ export default function PrefabEditor(props) {
               <ListItem button key="ZoomOut" onClick={() => {setCanvasZoom(canvasZoom-0.05)}}>
                 <ListItemIcon>
                   <ZoomOutIcon style={{fill: "#ddd"}} /> 
+                </ListItemIcon>
+                <ListItemText />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title="Fit canvas to screen">
+              <ListItem button key="Fit to screen" onClick={() => {
+                  let wScale = (window.innerWidth-64) / (editorCanvasInfo.width+40)
+                  let hScale = (window.innerHeight-47) / (editorCanvasInfo.height+40)
+                  if (wScale > hScale) {
+                    setCanvasZoom(hScale)
+                  } else {
+                    setCanvasZoom(wScale)
+                  }
+                  doRefreshCanvasCentre(refreshCanvasCentre+1)
+                }}>
+                <ListItemIcon>
+                  <ZoomOutMapIcon style={{fill: "#ddd"}} /> 
                 </ListItemIcon>
                 <ListItemText />
               </ListItem>
