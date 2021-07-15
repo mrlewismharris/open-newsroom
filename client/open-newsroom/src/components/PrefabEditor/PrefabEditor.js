@@ -11,6 +11,7 @@ import ZoomInIcon from '@material-ui/icons/ZoomIn';
 import ZoomOutIcon from '@material-ui/icons/ZoomOut';
 import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
 
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
   return <Slide direction="up" ref={ref} {...props} />;
@@ -38,7 +39,6 @@ export default function PrefabEditor(props) {
     setThisPrefabName(newName)
     setEditorCanvasInfo({width: newWidth, height: newHeight})
     doRefreshCanvasCentre(refreshCanvasCentre+1)
-    console.log(refreshCanvasCentre)
   }
 
   function closePrefabEditor() {
@@ -89,27 +89,24 @@ export default function PrefabEditor(props) {
                 <ListItemText />
               </ListItem>
             </Tooltip>
-            <Tooltip title="Zoom out">
-              <ListItem button key="ZoomOut" onClick={() => {setCanvasZoom(canvasZoom-0.05)}}>
-                <ListItemIcon>
-                  <ZoomOutIcon style={{fill: "#ddd"}} /> 
-                </ListItemIcon>
-                <ListItemText />
-              </ListItem>
-            </Tooltip>
             <Tooltip title="Fit canvas to screen">
               <ListItem button key="Fit to screen" onClick={() => {
                   let wScale = (window.innerWidth-64) / (editorCanvasInfo.width+40)
                   let hScale = (window.innerHeight-47) / (editorCanvasInfo.height+40)
-                  if (wScale > hScale) {
-                    setCanvasZoom(hScale)
-                  } else {
-                    setCanvasZoom(wScale)
-                  }
+                  if (wScale > hScale) { setCanvasZoom(hScale) }
+                  else { setCanvasZoom(wScale) }
                   doRefreshCanvasCentre(refreshCanvasCentre+1)
                 }}>
                 <ListItemIcon>
                   <ZoomOutMapIcon style={{fill: "#ddd"}} /> 
+                </ListItemIcon>
+                <ListItemText />
+              </ListItem>
+            </Tooltip>
+            <Tooltip title="Zoom out">
+              <ListItem button key="ZoomOut" onClick={() => {setCanvasZoom(canvasZoom-0.05)}}>
+                <ListItemIcon>
+                  <ZoomOutIcon style={{fill: "#ddd"}} /> 
                 </ListItemIcon>
                 <ListItemText />
               </ListItem>
@@ -193,6 +190,7 @@ export default function PrefabEditor(props) {
           canvasInfo={editorCanvasInfo}
           recentre={refreshCanvasCentre}
           zoom={canvasZoom}
+          id="canvas"
         />
 
       </Dialog>

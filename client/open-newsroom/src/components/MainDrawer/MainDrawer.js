@@ -1,8 +1,8 @@
 import React from 'react';
 import { List, ListItem, ListItemIcon, ListItemText, Divider, Drawer } from '@material-ui/core';
-import HomeIcon from '@material-ui/icons/Home';
-import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core/styles';
+import TextsmsIcon from '@material-ui/icons/Textsms';
 import './MainDrawer.css'
 
 const useStyles = makeStyles({
@@ -27,20 +27,20 @@ export default function MainDrawer(props) {
         onClick= { props.onClose }
       >
         <List>
-          <ListItem className="drawerButton" button key="Dummy Button">
+          <ListItem className="drawerButton" button key="1" onClick={props.prefabEditor}>
             <ListItemIcon>
-              <HomeIcon style={{fill: '#ddd'}} />
+              <EditIcon style={{fill: '#ddd'}} />
             </ListItemIcon>
-            <ListItemText primary="Dummy Button" />
+            <ListItemText primary="Prefab Editor" />
           </ListItem>
         </List>
         <Divider />
         <List>
-          <ListItem className="drawerButton" button key="Open Dialog" onClick={ props.openDialog }>
+          <ListItem className="drawerButton" button key="2" onClick={ props.serverConsole }>
             <ListItemIcon>
-              <OpenInNewIcon style={{fill: '#ddd'}} />
+              <TextsmsIcon style={{fill: '#ddd'}} />
             </ListItemIcon>
-            <ListItemText primary="Open Dialog"/>
+            <ListItemText primary="Open Server Console"/>
           </ListItem>
         </List>
       </div>

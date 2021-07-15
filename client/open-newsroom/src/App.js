@@ -4,6 +4,7 @@ import ContextMenu from 'components/ContextMenu/ContextMenu';
 import MainAppbar from 'components/MainAppbar/MainAppbar';
 import MainDrawer from 'components/MainDrawer/MainDrawer';
 import PrefabEditor from 'components/PrefabEditor/PrefabEditor';
+import ServerConsole from 'components/ServerConsole/ServerConsole';
 import MainTheme from 'components/Themes/MainTheme';
 import React, { useState } from 'react';
 import { io } from 'socket.io-client';
@@ -15,6 +16,7 @@ function App() {
   const [DialogMenuState, setDialogMenuState] = useState({x: null, y: null});
   const [DialogMenuContents, setDialogMenuContents] = useState(null);
   const [PrefabEditorOpen, setPrefabEditorOpen] = useState(false);
+  const [ServerConsoleOpen, setServerConsoleOpen] = useState(false)
 
   const contextHandle = (e, content) => {
     e.preventDefault();
@@ -43,7 +45,7 @@ function App() {
       <MainAppbar title="Open Newsroom for OBS" openDrawer={ () => setMainDrawerState(true) }>
         <Button 
           onContextMenu={(e) => contextHandle(e, [
-            <MenuItem key="1" onClick={() => setPrefabEditorOpen(true)}>Fullscreen Dialog</MenuItem>,
+            <MenuItem key="1" onClick={() => setPrefabEditorOpen(true)}>Prefab Editor</MenuItem>,
           ])}
           variant='contained'
           color='secondary'
@@ -51,7 +53,13 @@ function App() {
       </MainAppbar>
 
       {/* Hidden elements go here */}
-      <MainDrawer open={ MainDrawerState } onClose={ () => setMainDrawerState(false) } contextHandler={contextHandle}/>
+      <MainDrawer 
+        open={ MainDrawerState }
+        onClose={ () => setMainDrawerState(false) }
+        contextHandler={contextHandle}
+        prefabEditor={() => setPrefabEditorOpen(true)}
+        serverConsole={() => setServerConsoleOpen(true)}
+      />
       <ContextMenu 
         open={DialogMenuState.y !== null && DialogMenuContents !== null}
         onClose={contextHandleClose}
@@ -62,6 +70,8 @@ function App() {
         }
       />
       <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={{width: 1920, height: 1080}} />
+      
+      <ServerConsole open={ServerConsoleOpen} onClose={() => setServerConsoleOpen(false)}/>
 
     </ThemeProvider>
   );
