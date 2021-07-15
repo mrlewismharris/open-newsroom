@@ -15,12 +15,7 @@ export default function ServerConsole(props) {
   const initialConsole = [
     `Open Newsroom Server Console v0.0.1`,
     ` `,
-    `This console allows for text-based messages to be`,
-    `transmitted and recieved from the Open Newsroom server.`,
-    ` `,
-    `This could be helpful for debugging purposes, but also`,
-    `for custom batch commands to be sent to the server, as`,
-    `well as custom commands to be added to the project code.`
+    `Start typing with "!" to see available commands`
   ]
   const [contents, setContents] = useState(initialConsole)
 
@@ -33,7 +28,7 @@ export default function ServerConsole(props) {
     <Dialog
       onClick={() => {
         // @ts-ignore
-        inputRef.current.children[0].children[0].focus()
+        inputRef.current.focus()
       }}
       fullScreen
       className="ServerConsole"
@@ -74,7 +69,7 @@ export default function ServerConsole(props) {
         className="consoleInput"
       >
         <TextField
-          ref={inputRef}
+          inputRef={inputRef}
           autoFocus
           className="consoleInputText"
           fullWidth

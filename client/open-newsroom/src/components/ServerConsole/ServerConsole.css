@@ -26,9 +26,9 @@
 }
 
 .consoleInputText {
-  padding: 0!important
+  margin: 0!important
 }
 
-.MuiTextField-root {
+.MuiInputBase-input {
   color: #fff!important
 }
