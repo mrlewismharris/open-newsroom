@@ -8,8 +8,7 @@ Watch this space!
 
 ## Todo:
 * Server Console implementation
-  * Get the sent text + commands to show within the console
-    * May require to swap the container with <p> elements with a textarea instead :/
+  * Text + commands show within console, swap paragraph elements with textarea
   * Instant preview in a popper the available console commands
 * Get current scene and display on "/obs" page on refresh
 * Add "save scene" to save scenes and their info to text file
