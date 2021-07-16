@@ -42,12 +42,14 @@ export default function ServerConsole(props) {
         addToConsole(`The command "${target.value}" does not exist on the remote server or in the local dictionary. Please use the 'help' command to get a full list of commands.`)
         break;
     }
-    // @ts-ignore
-    consoleRef.current.scrollTop = consoleRef.current.scrollHeight
   }
 
   function addToConsole(text) {
     setServerConsole((prevState) => (prevState + "\n" + text))
+    setTimeout(() => {
+      // @ts-ignore
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight
+    }, 20)
   }
 
   return (
