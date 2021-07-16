@@ -17,6 +17,8 @@ function App() {
   const [DialogMenuContents, setDialogMenuContents] = useState(null);
   const [PrefabEditorOpen, setPrefabEditorOpen] = useState(false);
   const [ServerConsoleOpen, setServerConsoleOpen] = useState(false)
+  
+  let socket
 
   const contextHandle = (e, content) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ function App() {
 
   const setServerHandle = (address) => {
     setServerConnectState(address)
-    const socket = io(address)
+    socket = io(address)
     socket.on('disconnect', () => {
       setServerConnectState("")
     })
@@ -71,7 +73,7 @@ function App() {
       />
       <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={{width: 1920, height: 1080}} />
       
-      <ServerConsole open={ServerConsoleOpen} onClose={() => setServerConsoleOpen(false)}/>
+      <ServerConsole open={ServerConsoleOpen} onClose={() => setServerConsoleOpen(false)} io={socket}/>
 
     </ThemeProvider>
   );

@@ -1,5 +1,5 @@
-import { AppBar, Button, Checkbox, Container, Dialog, FormControlLabel, IconButton, Slide, TextField, Toolbar, Tooltip, Typography } from "@material-ui/core";
-import React, { useEffect, useRef, useState } from "react";
+import { AppBar, Checkbox, Container, Dialog, FormControlLabel, IconButton, Slide, TextField, Toolbar, Tooltip, Typography } from "@material-ui/core";
+import React, { useRef, useState } from "react";
 import CloseIcon from '@material-ui/icons/Close';
 import './ServerConsole.css'
 
@@ -11,26 +11,43 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function ServerConsole(props) {
 
   const inputRef = useRef();
+  const consoleRef = useRef();
 
-  const initialConsole = `Open Newsroom Server Console v0.0.1\n\nStart typing or execute "help" to see available commands\n\n`
-  const [contents, setContents] = useState(initialConsole)
+  const initialConsole = `Open Newsroom Server Console v0.0.1\n\nStart typing or execute "help" to see available commands\n`
+  const [serverConsole, setServerConsole] = useState(initialConsole)
   const [previewCommands, setPreviewCommands] = useState(true)
 
   function closeConsole() {
-    setContents(initialConsole)
+    setServerConsole(initialConsole)
     props.onClose()
   }
 
   function sniffCommand(text) {
-    if (text[0] === "!") {
-      
-    }
+    
   }
 
-  function execute(target) {
+  function Execute(target) {
     let d = new Date()
     let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-    setContents(contents + "\n" + formDate + " >>> " + target.value)
+    addToConsole(formDate + " >>> " + target.value)
+    //check the local functions first
+    switch(target.value) {
+      case "version":
+        addToConsole("v0.0.1")
+        break;
+      case "io":
+        //props.socket('')
+        break;
+      default:
+        addToConsole(`The command "${target.value}" does not exist on the remote server or in the local dictionary. Please use the 'help' command to get a full list of commands.`)
+        break;
+    }
+    // @ts-ignore
+    consoleRef.current.scrollTop = consoleRef.current.scrollHeight
+  }
+
+  function addToConsole(text) {
+    setServerConsole((prevState) => (prevState + "\n" + text))
   }
 
   return (
@@ -63,21 +80,14 @@ export default function ServerConsole(props) {
                   style={{color: "#fff"}}
                 />
               }
-              label="Instant Preview"
+              label="Peak Available Commands"
             />
           </Tooltip>
-          <Button
-            //ref={anchorRef_File}
-            variant="contained"
-            color="secondary"
-            className="AppbarButton"
-            onClick={() => {console.log("button clicked")}}
-          >Documentation</Button>
         </Toolbar>
       </AppBar>
 
       <Container fixed className="consoleContainer">
-        <textarea readOnly={true} className="terminalText" value={contents}/>
+        <textarea ref={consoleRef} readOnly={true} className="terminalText" value={serverConsole}/>
       </Container>
       <Container
         fixed
@@ -91,7 +101,7 @@ export default function ServerConsole(props) {
           margin="normal"
           onKeyDown={(e) => {
             if (e.code === "Enter") {
-              execute(e.target)
+              Execute(e.target)
               // @ts-ignore
               e.target.value=""
             }
