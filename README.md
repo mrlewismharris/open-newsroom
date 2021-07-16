@@ -14,3 +14,4 @@ Watch this space!
 * Get current scene and display on "/obs" page on refresh
 * Add "save scene" to save scenes and their info to text file
 * Start working on general UI (sketching)
+* Logging for server events

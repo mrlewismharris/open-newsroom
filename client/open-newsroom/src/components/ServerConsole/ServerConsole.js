@@ -12,20 +12,9 @@ export default function ServerConsole(props) {
 
   const inputRef = useRef();
 
-  const initialConsole = [
-    `Open Newsroom Server Console v0.0.1`,
-    ` `,
-    `Start typing or execute "help" to see available commands`,
-    ` `
-  ]
+  const initialConsole = `Open Newsroom Server Console v0.0.1\n\nStart typing or execute "help" to see available commands\n\n`
   const [contents, setContents] = useState(initialConsole)
-  const [consoleCollection, setConsoleCollection] = useState([])
   const [previewCommands, setPreviewCommands] = useState(true)
-
-  useEffect(() => {
-    setConsoleCollection(contents.map((item) => (<p className="terminalText">{item}</p>)))
-    setTimeout(() => {console.log(contents)}, 250)
-  }, [contents])
 
   function closeConsole() {
     setContents(initialConsole)
@@ -39,10 +28,9 @@ export default function ServerConsole(props) {
   }
 
   function execute(target) {
-    let command = target.value
-    let updatedContents = contents
-    updatedContents.push(command)
-    setContents(updatedContents)
+    let d = new Date()
+    let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+    setContents(contents + "\n" + formDate + " >>> " + target.value)
   }
 
   return (
@@ -89,7 +77,7 @@ export default function ServerConsole(props) {
       </AppBar>
 
       <Container fixed className="consoleContainer">
-        {consoleCollection}
+        <textarea readOnly={true} className="terminalText" value={contents}/>
       </Container>
       <Container
         fixed
