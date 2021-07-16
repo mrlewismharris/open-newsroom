@@ -57,6 +57,17 @@ app.get('/test', (req, res) => {
 
 io.on('connect', (socket) => {
 
+  socket.on("console", (data, fn) => {
+    console.log("recieved a server console message", data)
+    switch(data) {
+      case "test":
+        let d = new Date();
+        let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+        fn(`Your message was recieved by the server at: ${formDate} (server time)`)
+        break;
+    }
+  })
+
   socket.emit('iniFile', ini)
 
   if (serverFirstRun) {

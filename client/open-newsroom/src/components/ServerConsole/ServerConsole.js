@@ -35,8 +35,10 @@ export default function ServerConsole(props) {
       case "version":
         addToConsole("v0.0.1")
         break;
-      case "io":
-        //props.socket('')
+      case "test":
+        props.io("console", "test", (response) => {
+          addToConsole(response)
+        })
         break;
       default:
         addToConsole(`The command "${target.value}" does not exist on the remote server or in the local dictionary. Please use the 'help' command to get a full list of commands.`)

@@ -41,6 +41,10 @@ function App() {
     })
   }
 
+  const ioHandle = (event, args, ack) => {
+    socket.emit(event, args, ack)
+  }
+
   return (
     <ThemeProvider theme={ MainTheme.c222 }>
       <ConnectDialog open={ServerConnectState!==""?false:true} onClose={setServerHandle} />
@@ -73,7 +77,7 @@ function App() {
       />
       <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={{width: 1920, height: 1080}} />
       
-      <ServerConsole open={ServerConsoleOpen} onClose={() => setServerConsoleOpen(false)} io={socket}/>
+      <ServerConsole open={ServerConsoleOpen} onClose={() => setServerConsoleOpen(false)} io={ioHandle}/>
 
     </ThemeProvider>
   );
