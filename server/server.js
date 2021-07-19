@@ -1,5 +1,4 @@
 const app = require('express')();
-//const http = require('http').Server(app);
 const io = require('socket.io')(3001, {
   cors: {
     origin: 'http://localhost:3000',
@@ -32,28 +31,6 @@ fs.access("settings.ini", fs.F_OK, (err) => {
     })
   }
 })
-
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
-
-//get all js files from directory
-app.get('/js/:file', (req,res) => {
-  res.sendFile(`${__dirname}/js/${req.params.file}`)
-})
-
-//get all css files from directory
-app.get('/css/:file', (req,res) => {
-  res.sendFile(`${__dirname}/css/${req.params.file}`)
-})
-
-app.get('/obs', (req, res) => {
-  res.sendFile(__dirname + '/obs.html');
-});
-
-app.get('/test', (req, res) => {
-  res.sendFile(__dirname + '/test.html');
-});
 
 io.on('connect', (socket) => {
 
@@ -121,9 +98,3 @@ io.on('connect', (socket) => {
   })
 
 });
-
-/*
-http.listen(3001, () => {
-   console.log('listening on *:3001');
-});
-*/
