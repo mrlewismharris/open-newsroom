@@ -13,6 +13,10 @@ export default function ConnectDialog(props) {
   const connectHandle = useCallback(() => {
     setConnectIcon(<CircularProgress disableShrink style={{color: '#00C853'}} size={20} thickness={7} />)
     setConnectionError(false)
+    if (address === "") {
+      setConnectionError(true)
+      return null
+    }
 
     const socket = io(address, {
       reconnection: false,
