@@ -38,3 +38,23 @@
 .MuiInputBase-input {
   color: #fff!important
 }
+
+.commandPopper {
+  background: #000!important;
+  color: #fff!important;
+  border: 2px solid #fff!important;
+  z-index: 3000!important;
+}
+
+.commandPopperItem {
+  padding: 0px 5px;
+  margin: 0;
+  color: #fff;
+  background: #000;
+  width: 700px;
+  max-height: 400px;
+}
+
+.commandPopperItemLocale {
+  font-style: italic;
+}
