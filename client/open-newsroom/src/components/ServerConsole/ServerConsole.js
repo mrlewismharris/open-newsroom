@@ -23,8 +23,10 @@ export default function ServerConsole(props) {
   const [commandPopperContent, setCommandPopperContent] = useState([])
   //test data for the popper
   const testData = [
-    {command: "version", description: "Returns Open Newsroom version(s)", locale: "local"},
-    {command: "test", description: "Test connection to the server", locale: "remote"},
+    {command: "version", description: "Returns Open Newsroom version(s)", locale: "local",
+      args: "None"},
+    {command: "test", description: "Test connection to the server", locale: "remote",
+      args: "None"},
   ]
 
   function closeConsole() {
@@ -33,6 +35,7 @@ export default function ServerConsole(props) {
   }
 
   function sniffCommand(event) {
+    if (!previewCommands) { return }
     let input = event.target.value
     let searchedArray = []
     testData.forEach(item => {
@@ -143,7 +146,7 @@ export default function ServerConsole(props) {
       </Container>
       <CommandPopper open={Boolean(commandPopperAnchor)} anchor={commandPopperAnchor}>
         {commandPopperContent.map((command, index) => (
-          <p className="commandPopperItem"><u>{command.command}</u> : {command.description} <span className="commandPopperItemLocale">({command.locale})</span></p>
+          <p className="commandPopperItem"><u>{command.command}</u> : {command.description} <span className="commandPopperItemLocale">({command.locale})</span><br/><span className="commandPopperItemArgs">Args: {command.args}</span></p>
         ))}
       </CommandPopper>
     </Dialog>

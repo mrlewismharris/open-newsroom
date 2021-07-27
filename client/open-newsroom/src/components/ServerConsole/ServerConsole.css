@@ -58,3 +58,6 @@
 .commandPopperItemLocale {
   font-style: italic;
 }
+.commandPopperItemArgs {
+  padding-left: 15px;
+}
