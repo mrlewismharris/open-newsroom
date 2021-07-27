@@ -35,8 +35,10 @@ export default function ServerConsole(props) {
   }
 
   function sniffCommand(event) {
+    console.log(event)
     if (!previewCommands) { return }
     let input = event.target.value
+    if (input.includes(" ")) {input = input.split(" ")[0]}
     let searchedArray = []
     testData.forEach(item => {
       if (item.command.includes(input)) {
@@ -56,7 +58,7 @@ export default function ServerConsole(props) {
     let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
     addToConsole(formDate + " >>> " + target.value)
     let command = target.value
-    if (command.includes(" ")) {command = command.splice(" ")[0]}
+    if (command.includes(" ")) {command = command.split(" ")[0]}
     //check the local functions first
     switch(command) {
       case "version":
