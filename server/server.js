@@ -12,6 +12,8 @@ let serverFirstRun = true;
 let collectionName = "";
 let ini;
 
+let version = "0.0.1";
+
 fs.access("settings.ini", fs.F_OK, (err) => {
   if (err) {
     //wizard will go here, trigger when no settings.ini
@@ -37,10 +39,16 @@ io.on('connect', (socket) => {
   socket.on("console", (data, fn) => {
     console.log("recieved a server console message", data)
     switch(data) {
+      case "server_version":
+        fn(`Server Version: v${version}`)
+        break;
       case "test":
         let d = new Date();
         let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
         fn(`Your message was recieved by the server at: ${formDate} (server time)`)
+        break;
+      default:
+        fn(`Error: The command "${data}" was not recognised as a client-side or server-side dictionary command. Please enable "Peak Available Commands" or type "help" to view all available comannds.`)
         break;
     }
   })

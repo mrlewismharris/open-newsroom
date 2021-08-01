@@ -17,6 +17,8 @@ export default function ServerConsole(props) {
   const initialConsole = `Open Newsroom Server Console v0.0.1\n\nStart typing or execute "help" to see available commands\n`
   const [serverConsole, setServerConsole] = useState(initialConsole)
   const [previewCommands, setPreviewCommands] = useState(true)
+  const [commandHistoryList, setCommandHistoryList] = useState([])
+  const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1)
 
   //command popper states
   const [commandPopperAnchor, setCommandPopperAnchor] = useState(null)
@@ -29,13 +31,25 @@ export default function ServerConsole(props) {
       args: "None"},
   ]
 
+  function commandHistoryHandler() {
+    if (commandHistoryList.length === 0) {
+      return ""
+    } else {
+      if (commandHistoryIndex === 0) {
+        setCommandHistoryIndex(commandHistoryList.length-1)
+      } else {
+        setCommandHistoryIndex(commandHistoryIndex-1)
+      }
+      return commandHistoryList[commandHistoryIndex]
+    }
+  }
+
   function closeConsole() {
     setServerConsole(initialConsole)
     props.onClose()
   }
 
   function sniffCommand(event) {
-    console.log(event)
     if (!previewCommands) { return }
     let input = event.target.value
     if (input.includes(" ")) {input = input.split(" ")[0]}
@@ -59,19 +73,22 @@ export default function ServerConsole(props) {
     addToConsole(formDate + " >>> " + target.value)
     let command = target.value
     if (command.includes(" ")) {command = command.split(" ")[0]}
-    //check the local functions first
-    switch(command) {
-      case "version":
-        addToConsole("v0.0.1")
-        break;
-      case "test":
-        props.io("console", "test", (response) => {
-          addToConsole(response)
-        })
-        break;
-      default:
-        addToConsole(`The command "${target.value}" does not exist in the local or remote dictionaries. Please use the 'help' command to get a full list of commands.`)
-        break;
+    if (command) {
+      //add the command to the history
+      setCommandHistoryList(list => [...list, command])
+      //set the index of commandHistory to -1
+      setCommandHistoryIndex(commandHistoryList.length)
+      //check the local functions first
+      switch(command) {
+        case "version":
+          addToConsole("v0.0.1")
+          break;
+        default:
+          props.io("console", command, (response) => {
+            addToConsole(response)
+          })
+          break;
+      }
     }
     setCommandPopperAnchor(null)
   }
@@ -137,7 +154,14 @@ export default function ServerConsole(props) {
             if (e.code === "Enter") {
               Execute(e.target)
               // @ts-ignore
-              e.target.value=""
+              e.target.value = ""
+            } else if (e.code === "ArrowUp") {
+              // @ts-ignore
+              e.target.value = commandHistoryHandler()
+              setTimeout(() => {
+                // @ts-ignore
+                e.target.selectionStart = e.target.value.length
+              }, 0)
             }
           }}
           onChange={(e) => {
@@ -147,7 +171,9 @@ export default function ServerConsole(props) {
         />
       </Container>
       <CommandPopper open={Boolean(commandPopperAnchor)} anchor={commandPopperAnchor}>
-        {commandPopperContent.map((command, index) => (
+        {commandPopperContent.map((command, 
+// @ts-ignore
+        index) => (
           <p className="commandPopperItem"><u>{command.command}</u> : {command.description} <span className="commandPopperItemLocale">({command.locale})</span><br/><span className="commandPopperItemArgs">Args: {command.args}</span></p>
         ))}
       </CommandPopper>
