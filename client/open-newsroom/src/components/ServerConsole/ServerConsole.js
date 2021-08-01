@@ -31,7 +31,7 @@ export default function ServerConsole(props) {
       args: "None"},
   ]
 
-  function commandHistoryHandler() {
+  function commandHistoryHandlerUp() {
     if (commandHistoryList.length === 0) {
       return ""
     } else {
@@ -39,6 +39,19 @@ export default function ServerConsole(props) {
         setCommandHistoryIndex(commandHistoryList.length-1)
       } else {
         setCommandHistoryIndex(commandHistoryIndex-1)
+      }
+      return commandHistoryList[commandHistoryIndex]
+    }
+  }
+
+  function commandHistoryHandlerDown() {
+    if (commandHistoryList.length === 0) {
+      return ""
+    } else {
+      if (commandHistoryIndex+1 === commandHistoryList.length) {
+        setCommandHistoryIndex(0)
+      } else {
+        setCommandHistoryIndex(commandHistoryIndex+1)
       }
       return commandHistoryList[commandHistoryIndex]
     }
@@ -157,11 +170,14 @@ export default function ServerConsole(props) {
               e.target.value = ""
             } else if (e.code === "ArrowUp") {
               // @ts-ignore
-              e.target.value = commandHistoryHandler()
+              e.target.value = commandHistoryHandlerUp()
               setTimeout(() => {
                 // @ts-ignore
                 e.target.selectionStart = e.target.value.length
               }, 0)
+            } else if (e.code === "ArrowDown") {
+              // @ts-ignore
+              e.target.value = commandHistoryHandlerDown()
             }
           }}
           onChange={(e) => {
