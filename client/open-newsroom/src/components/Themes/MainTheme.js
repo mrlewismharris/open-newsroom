@@ -12,6 +12,17 @@ const MainTheme = {
       }
     }
   }),
+  white: createMuiTheme({
+    palette: {
+      background: {
+        default: '#000'
+      }, primary: {
+        main: '#fff'
+      }, secondary: {
+        main: '#fff'
+      }
+    }
+  })
 }
 
 export default MainTheme;

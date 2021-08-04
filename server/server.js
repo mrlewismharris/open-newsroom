@@ -14,6 +14,15 @@ let ini;
 
 let version = "0.0.1";
 
+const dictionary = [
+  {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote",
+    args: "None"},
+  {command: "server_test", description: "Test connection to the server", locale: "remote",
+    args: "None"},
+  {command: "read_collection", description: "Read and return the user/prefabs.json file (if exists)", locale: "remote",
+    args: "None"},
+]
+
 fs.access("settings.ini", fs.F_OK, (err) => {
   if (err) {
     //wizard will go here, trigger when no settings.ini
@@ -34,13 +43,20 @@ fs.access("settings.ini", fs.F_OK, (err) => {
   }
 })
 
-//collections json file containing prefabs CRUD
+//create json file containing prefab collections
 function createCollection() {
 
 }
 
+//read json file containing prefab collections
 function readCollection() {
-
+  fs.access("fs/prefabs.json", fs.F_OK, (err) => {
+    if (err) {
+      return false
+    } else {
+      return true
+    }
+  })
 }
 
 function updateCollection() {
@@ -52,6 +68,11 @@ function deleteCollection() {
 }
 
 io.on('connect', (socket) => {
+
+  //return the command dictionary
+  socket.on("getServerDictionary", (data, fn) => {
+    fn(dictionary)
+  })
 
   socket.on("console", (data, fn) => {
     console.log("recieved a client console message", data)
@@ -65,15 +86,18 @@ io.on('connect', (socket) => {
       params = true
       trimmedData = trimmedData.split(" ")[0]
     }
-    let redactedParamsMessage = "Command did not require parameters (which were present), so command was executed with parameters redacted.\n"
-    switch(data) {
+    let redactedParamsMessage = "Additional parameters redacted before execution.\n"
+    switch(trimmedData) {
+      case "read_collection":
+        fn(readCollection())
+        break;
       case "server_version":
         fn(`Server Version: v${version}`)
         break;
       case "test":
         let d = new Date();
         let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-        let paramMessage = !params?redactedParamsMessage:""
+        let paramMessage = params?redactedParamsMessage:""
         fn(`${paramMessage}Your message was recieved by the server at: ${formDate} (server time)`)
         break;
       default:

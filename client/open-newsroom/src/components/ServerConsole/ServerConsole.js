@@ -1,4 +1,4 @@
-import { AppBar, Checkbox, Container, Dialog, FormControlLabel, IconButton, Slide, TextField, Toolbar, Tooltip, Typography } from "@material-ui/core";
+import { AppBar, Checkbox, Container, createMuiTheme, Dialog, FormControlLabel, IconButton, Slide, TextField, ThemeProvider, Toolbar, Tooltip, Typography } from "@material-ui/core";
 import React, { useRef, useState } from "react";
 import CloseIcon from '@material-ui/icons/Close';
 import './ServerConsole.css'
@@ -23,11 +23,11 @@ export default function ServerConsole(props) {
   //command popper states
   const [commandPopperAnchor, setCommandPopperAnchor] = useState(null)
   const [commandPopperContent, setCommandPopperContent] = useState([])
-  //test data for the popper
-  const testData = [
-    {command: "version", description: "Returns Open Newsroom version(s)", locale: "local",
-      args: "None"},
-    {command: "test", description: "Test connection to the server", locale: "remote",
+  
+  const [fetchedRemote, setFetchedRemote] = useState(false)  
+  const [dictionary, setDictionary] = useState([])
+  let localDictionary = [
+    {command: "client_version", description: "Returns Open Newsroom version(s)", locale: "local",
       args: "None"},
   ]
 
@@ -43,6 +43,17 @@ export default function ServerConsole(props) {
       return commandHistoryList[commandHistoryIndex]
     }
   }
+
+  const themeWhite = createMuiTheme({
+    palette: {
+      primary: {
+        main: '#777'
+      },
+      text: {
+        primary: '#fff'
+      }
+    }
+  })
 
   function commandHistoryHandlerDown() {
     if (commandHistoryList.length === 0) {
@@ -62,12 +73,23 @@ export default function ServerConsole(props) {
     props.onClose()
   }
 
+  function getRemoteDictionary() {
+    if (!fetchedRemote) {
+      props.io("getServerDictionary", null, response => {
+        setDictionary(localDictionary.concat(response))
+      })
+      setFetchedRemote(true)
+    }
+    return true
+  }
+
   function sniffCommand(event) {
-    if (!previewCommands) { return }
+    getRemoteDictionary()
+    if (!previewCommands) return
     let input = event.target.value
     if (input.includes(" ")) {input = input.split(" ")[0]}
     let searchedArray = []
-    testData.forEach(item => {
+    dictionary.forEach(item => {
       if (item.command.includes(input)) {
         searchedArray.push(item)
       }
@@ -85,6 +107,7 @@ export default function ServerConsole(props) {
     let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
     addToConsole(formDate + " >>> " + target.value)
     if (target.value) {
+      let originalCommand = target.value
       let command = target.value
       //add the command to the history
       setCommandHistoryList(list => [...list, command])
@@ -94,11 +117,11 @@ export default function ServerConsole(props) {
         if (command.includes(" ")) {command = command.split(" ")[0]}
         //check the local functions first
         switch(command) {
-          case "version":
+          case "client_version":
             addToConsole("v0.0.1")
             break;
           default:
-            props.io("console", command, (response) => {
+            props.io("console", originalCommand, (response) => {
               addToConsole(response)
             })
             break;
@@ -159,40 +182,42 @@ export default function ServerConsole(props) {
         fixed
         className="consoleInput"
       >
-        <TextField
-          inputRef={inputRef}
-          autoFocus
-          className="consoleInputText"
-          fullWidth
-          margin="normal"
-          onKeyDown={(e) => {
-            if (e.code === "Enter") {
-              Execute(e.target)
-              // @ts-ignore
-              e.target.value = ""
-            } else if (e.code === "ArrowUp") {
-              // @ts-ignore
-              e.target.value = commandHistoryHandlerUp()
-              setTimeout(() => {
+        <ThemeProvider theme={themeWhite}>
+          <TextField
+            inputRef={inputRef}
+            autoFocus
+            className="consoleInputText"
+            fullWidth
+            margin="normal"
+            onKeyDown={(e) => {
+              if (e.code === "Enter") {
+                Execute(e.target)
                 // @ts-ignore
-                e.target.selectionStart = e.target.value.length
-              }, 0)
-            } else if (e.code === "ArrowDown") {
-              // @ts-ignore
-              e.target.value = commandHistoryHandlerDown()
-            }
-          }}
-          onChange={(e) => {
-            //sniffCommand(e.target.value)
-            sniffCommand(e)
-          }}
-        />
+                e.target.value = ""
+              } else if (e.code === "ArrowUp") {
+                // @ts-ignore
+                e.target.value = commandHistoryHandlerUp()
+                setTimeout(() => {
+                  // @ts-ignore
+                  e.target.selectionStart = e.target.value.length
+                }, 0)
+              } else if (e.code === "ArrowDown") {
+                // @ts-ignore
+                e.target.value = commandHistoryHandlerDown()
+              } else if (e.code === "Tab") {
+                e.preventDefault()
+              }
+            }}
+            onChange={(e) => {
+              //sniffCommand(e.target.value)
+              sniffCommand(e)
+            }}
+          />
+        </ThemeProvider>
       </Container>
       <CommandPopper open={Boolean(commandPopperAnchor)} anchor={commandPopperAnchor}>
-        {commandPopperContent.map((command, 
-// @ts-ignore
-        index) => (
-          <p className="commandPopperItem"><u>{command.command}</u> : {command.description} <span className="commandPopperItemLocale">({command.locale})</span><br/><span className="commandPopperItemArgs">Args: {command.args}</span></p>
+        {commandPopperContent.map((command, index) => (
+          <p className="commandPopperItem"><b>{command.command}</b> : {command.description} <span className="commandPopperItemLocale">({command.locale})</span><br/><span className="commandPopperItemArgs">Args: {command.args}</span></p>
         ))}
       </CommandPopper>
     </Dialog>
