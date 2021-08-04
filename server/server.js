@@ -34,10 +34,38 @@ fs.access("settings.ini", fs.F_OK, (err) => {
   }
 })
 
+//collections json file containing prefabs CRUD
+function createCollection() {
+
+}
+
+function readCollection() {
+
+}
+
+function updateCollection() {
+
+}
+
+function deleteCollection() {
+
+}
+
 io.on('connect', (socket) => {
 
   socket.on("console", (data, fn) => {
-    console.log("recieved a server console message", data)
+    console.log("recieved a client console message", data)
+    if (data.trim() == "") {
+      fn("Client message was empty")
+      return
+    }
+    let trimmedData = data
+    let params = false
+    if (trimmedData.includes(" ")) {
+      params = true
+      trimmedData = trimmedData.split(" ")[0]
+    }
+    let redactedParamsMessage = "Command did not require parameters (which were present), so command was executed with parameters redacted.\n"
     switch(data) {
       case "server_version":
         fn(`Server Version: v${version}`)
@@ -45,7 +73,8 @@ io.on('connect', (socket) => {
       case "test":
         let d = new Date();
         let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-        fn(`Your message was recieved by the server at: ${formDate} (server time)`)
+        let paramMessage = !params?redactedParamsMessage:""
+        fn(`${paramMessage}Your message was recieved by the server at: ${formDate} (server time)`)
         break;
       default:
         fn(`Error: The command "${data}" was not recognised as a client-side or server-side dictionary command. Please enable "Peak Available Commands" or type "help" to view all available comannds.`)

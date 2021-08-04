@@ -17,8 +17,8 @@ export default function ServerConsole(props) {
   const initialConsole = `Open Newsroom Server Console v0.0.1\n\nStart typing or execute "help" to see available commands\n`
   const [serverConsole, setServerConsole] = useState(initialConsole)
   const [previewCommands, setPreviewCommands] = useState(true)
-  const [commandHistoryList, setCommandHistoryList] = useState([])
-  const [commandHistoryIndex, setCommandHistoryIndex] = useState(-1)
+  const [commandHistoryList, setCommandHistoryList] = useState([""])
+  const [commandHistoryIndex, setCommandHistoryIndex] = useState(0)
 
   //command popper states
   const [commandPopperAnchor, setCommandPopperAnchor] = useState(null)
@@ -84,24 +84,26 @@ export default function ServerConsole(props) {
     let d = new Date()
     let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
     addToConsole(formDate + " >>> " + target.value)
-    let command = target.value
-    if (command.includes(" ")) {command = command.split(" ")[0]}
-    if (command) {
+    if (target.value) {
+      let command = target.value
       //add the command to the history
       setCommandHistoryList(list => [...list, command])
-      //set the index of commandHistory to -1
-      setCommandHistoryIndex(commandHistoryList.length)
-      //check the local functions first
-      switch(command) {
-        case "version":
-          addToConsole("v0.0.1")
-          break;
-        default:
-          props.io("console", command, (response) => {
-            addToConsole(response)
-          })
-          break;
-      }
+      setTimeout(() => {
+        //set the index of commandHistory to -1
+        setCommandHistoryIndex(commandHistoryList.length)
+        if (command.includes(" ")) {command = command.split(" ")[0]}
+        //check the local functions first
+        switch(command) {
+          case "version":
+            addToConsole("v0.0.1")
+            break;
+          default:
+            props.io("console", command, (response) => {
+              addToConsole(response)
+            })
+            break;
+        }
+      }, 0)
     }
     setCommandPopperAnchor(null)
   }
