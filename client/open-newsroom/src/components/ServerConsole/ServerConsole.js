@@ -29,6 +29,10 @@ export default function ServerConsole(props) {
   let localDictionary = [
     {command: "client_version", description: "Returns Open Newsroom version(s)", locale: "local",
       args: "None"},
+    {command: "client_help", description: "Display all the available commands from the client dictionary", locale: "local",
+      args: "None"},
+    {command: "clear", description: "Clear the console", locale: "local",
+        args: "None"},
   ]
 
   function commandHistoryHandlerUp() {
@@ -117,6 +121,12 @@ export default function ServerConsole(props) {
         if (command.includes(" ")) {command = command.split(" ")[0]}
         //check the local functions first
         switch(command) {
+          case "clear":
+            clearConsole()
+            break;
+          case "client_help":
+            addToConsole(localDictionary.map(command => `${command.command} : ${command.description} (${command.locale}) - Args: ${command.args}`).join('\n'))
+            break;
           case "client_version":
             addToConsole("v0.0.1")
             break;
@@ -133,6 +143,14 @@ export default function ServerConsole(props) {
 
   function addToConsole(text) {
     setServerConsole((prevState) => (prevState + "\n" + text))
+    setTimeout(() => {
+      // @ts-ignore
+      consoleRef.current.scrollTop = consoleRef.current.scrollHeight
+    }, 20)
+  }
+
+  function clearConsole() {
+    setServerConsole("")
     setTimeout(() => {
       // @ts-ignore
       consoleRef.current.scrollTop = consoleRef.current.scrollHeight
@@ -205,7 +223,7 @@ export default function ServerConsole(props) {
                 // @ts-ignore
                 e.target.value = commandHistoryHandlerDown()
               } else if (e.code === "Tab") {
-                e.preventDefault()
+                e.preventDefault()  
               }
             }}
             onChange={(e) => {

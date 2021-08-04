@@ -21,6 +21,8 @@ const dictionary = [
     args: "None"},
   {command: "read_collection", description: "Read and return the user/prefabs.json file (if exists)", locale: "remote",
     args: "None"},
+  {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote",
+      args: "None"},
 ]
 
 fs.access("settings.ini", fs.F_OK, (err) => {
@@ -94,11 +96,14 @@ io.on('connect', (socket) => {
       case "server_version":
         fn(`Server Version: v${version}`)
         break;
-      case "test":
+      case "server_test":
         let d = new Date();
         let formDate = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
         let paramMessage = params?redactedParamsMessage:""
         fn(`${paramMessage}Your message was recieved by the server at: ${formDate} (server time)`)
+        break;
+      case "server_help":
+        fn(dictionary.map(command => `${command.command} : ${command.description} (${command.locale}) - Args: ${command.args}`).join('\n'))
         break;
       default:
         fn(`Error: The command "${data}" was not recognised as a client-side or server-side dictionary command. Please enable "Peak Available Commands" or type "help" to view all available comannds.`)
