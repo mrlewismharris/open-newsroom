@@ -111,7 +111,7 @@ export default function ServerConsole(props) {
     if (input.includes(" ")) {input = input.split(" ")[0]}
     let searchedArray = []
     dictionary.forEach(item => {
-      if (item.command.includes(`${input}`)) {
+      if (item.command.indexOf(`${input}`)===0) {
         searchedArray.unshift(item)
         setTypedMatchedCommand(searchedArray)
       }
