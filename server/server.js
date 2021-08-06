@@ -21,6 +21,8 @@ const dictionary = [
     args: "None"},
   {command: "collection_update", description: "Update the prefabs.json file (if exists)", locale: "remote",
       args: "1: The new prefab.json contents (must be in 'single quotes')"},
+  {command: "collection_delete", description: "Delete the prefabs.json file", locale: "remote",
+    args: "None"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote",
     args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote",
@@ -85,7 +87,13 @@ function updateCollection(data) {
 }
 
 function deleteCollection() {
-
+  let fsDir = fs.readdirSync('fs')
+  if (fsDir.includes("prefabs.json")) {
+    fs.unlinkSync('fs/prefabs.json')
+    return "prefabs.json successfully deleted"
+  } else {
+    return "prefabs.json doesn't existm, could not delete"
+  }
 }
 
 io.on('connect', (socket) => {
@@ -119,6 +127,9 @@ io.on('connect', (socket) => {
       case "collection_update":
         let update = data.split("'")[1]
         fn(updateCollection(update))
+        break;
+      case "collection_delete":
+        fn(deleteCollection())
         break;
       case "server_version":
         fn(`Server Version: v${version}`)
