@@ -104,15 +104,26 @@ function createFolder(folderName) {
     return "Folder could not be created, prefab.json does not exist"
   } else {
     let extraOutput = ""
+    let folderExists = false
     let tempCollection = JSON.parse(collection)
     if (tempCollection.folders === undefined) {
       tempCollection.folders = []
       extraOutput = " (folder key wasn't present in object - created and added)"
+    } else {
+      console.log(tempCollection.folders)
+      if (tempCollection.folders.includes(folderName)) {
+        console.log(`folder ${folderName} already exists`)
+        folderExists = true
+      }
     }
-    tempCollection.folders.push(folderName)
-    console.log(tempCollection)
-    updateCollection(JSON.stringify(tempCollection))
-    return "Folder added successfully to prefabs.json" + extraOutput
+    if (!folderExists) {
+      tempCollection.folders.push(folderName)
+      console.log(tempCollection)
+      updateCollection(JSON.stringify(tempCollection))
+      return "Folder added successfully to prefabs.json" + extraOutput
+    } else {
+      return "Folder already exists in prefab.json"
+    }
   }
 }
 
