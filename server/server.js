@@ -19,7 +19,7 @@ const dictionary = [
     args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote",
     args: "None"},
-  {command: "read_collection", description: "Read and return the user/prefabs.json file (if exists)", locale: "remote",
+  {command: "collection_read", description: "Read and return the user/prefabs.json file (if exists)", locale: "remote",
     args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote",
       args: "None"},
@@ -90,7 +90,7 @@ io.on('connect', (socket) => {
     }
     let redactedParamsMessage = "Additional parameters redacted before execution.\n"
     switch(trimmedData) {
-      case "read_collection":
+      case "collection_read":
         fn(readCollection())
         break;
       case "server_version":

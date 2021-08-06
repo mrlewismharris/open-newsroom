@@ -28,6 +28,7 @@ export default function ServerConsole(props) {
   const [typedMatchedCommand, setTypedMatchedCommand] = useState([])
   const [typedMatchedCommandIndex, setTypedMatchedCommandIndex] = useState(0)
   const [dictionary, setDictionary] = useState([])
+
   let localDictionary = [
     {command: "client_version", description: "Returns Open Newsroom version(s)", locale: "local",
       args: "None"},
@@ -36,19 +37,6 @@ export default function ServerConsole(props) {
     {command: "clear", description: "Clear the console", locale: "local",
         args: "None"},
   ]
-
-  function commandHistoryHandlerUp() {
-    if (commandHistoryList.length === 0) {
-      return ""
-    } else {
-      if (commandHistoryIndex === 0) {
-        setCommandHistoryIndex(commandHistoryList.length-1)
-      } else {
-        setCommandHistoryIndex(commandHistoryIndex-1)
-      }
-      return commandHistoryList[commandHistoryIndex]
-    }
-  }
 
   const themeWhite = createMuiTheme({
     palette: {
@@ -61,11 +49,25 @@ export default function ServerConsole(props) {
     }
   })
 
+  function commandHistoryHandlerUp() {
+    if (commandHistoryList.length === 0) {
+      return ""
+    } else {
+      if (commandHistoryIndex <= 0) {
+        setCommandHistoryIndex(commandHistoryList.length-1)
+      } else {
+        setCommandHistoryIndex(commandHistoryIndex-1)
+      }
+      console.log(commandHistoryIndex)
+      return commandHistoryList[commandHistoryIndex]
+    }
+  }
+
   function commandHistoryHandlerDown() {
     if (commandHistoryList.length === 0) {
       return ""
     } else {
-      if (commandHistoryIndex+1 === commandHistoryList.length) {
+      if (commandHistoryIndex+1 >= commandHistoryList.length) {
         setCommandHistoryIndex(0)
       } else {
         setCommandHistoryIndex(commandHistoryIndex+1)
