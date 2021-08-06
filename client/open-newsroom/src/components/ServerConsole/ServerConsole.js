@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import CloseIcon from '@material-ui/icons/Close';
 import './ServerConsole.css'
 import CommandPopper from "./CommandPopper";
-import { ContactSupportOutlined } from "@material-ui/icons";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -76,7 +75,7 @@ export default function ServerConsole(props) {
   }
 
   function completeFunctionName() {
-    if (typedMatchedCommand.length === 0) {
+    if (typedMatchedCommand.length === 0 || typedMatchedCommand.length === dictionary.length) {
       return false
     } else {
       let selectedCommand = typedMatchedCommand[typedMatchedCommand.length-1-typedMatchedCommandIndex].command
