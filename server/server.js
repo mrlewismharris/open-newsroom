@@ -15,11 +15,13 @@ let ini;
 let version = "0.0.1";
 
 const dictionary = [
+  {command: "collection_create", description: "Create prefabs.json file (if doesn't already exists)", locale: "remote",
+    args: "None"},
+  {command: "collection_read", description: "Read and return the prefabs.json file (if exists)", locale: "remote",
+    args: "None"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote",
     args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote",
-    args: "None"},
-  {command: "collection_read", description: "Read and return the user/prefabs.json file (if exists)", locale: "remote",
     args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote",
       args: "None"},
@@ -47,18 +49,18 @@ fs.access("settings.ini", fs.F_OK, (err) => {
 
 //create json file containing prefab collections
 function createCollection() {
-
+  let fsDir = fs.readdirSync('fs')
+  if (fsDir.includes("prefabs.json")) {
+    return "prefabs.json already exists"
+  } else {
+    fs.writeFileSync('fs/prefabs.json', '[]')
+    return "prefabs.json created"
+  }
 }
 
 //read json file containing prefab collections
 function readCollection() {
-  fs.access("fs/prefabs.json", fs.F_OK, (err) => {
-    if (err) {
-      return false
-    } else {
-      return true
-    }
-  })
+  return "readCollection() fired"
 }
 
 function updateCollection() {
@@ -90,6 +92,10 @@ io.on('connect', (socket) => {
     }
     let redactedParamsMessage = "Additional parameters redacted before execution.\n"
     switch(trimmedData) {
+      //collection CRUD (json containing prefabs)
+      case "collection_create":
+        fn(createCollection())
+        break;
       case "collection_read":
         fn(readCollection())
         break;

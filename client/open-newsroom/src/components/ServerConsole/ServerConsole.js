@@ -58,7 +58,6 @@ export default function ServerConsole(props) {
       } else {
         setCommandHistoryIndex(commandHistoryIndex-1)
       }
-      console.log(commandHistoryIndex)
       return commandHistoryList[commandHistoryIndex]
     }
   }
