@@ -20,9 +20,9 @@ const dictionary = [
   {command: "collection_read", description: "Read and return the prefabs.json file (if exists)", locale: "remote",
     args: "None"},
   {command: "collection_update", description: "Update the prefabs.json file (if exists)", locale: "remote",
-      args: "None"},
+      args: "1: The new prefab.json contents (must be in 'single quotes')"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote",
-    args: "1: The new prefab.json contents (must be in quotes)"},
+    args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote",
     args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote",
@@ -117,7 +117,7 @@ io.on('connect', (socket) => {
         fn(readCollection())
         break;
       case "collection_update":
-        let update = data.split('"')[1]
+        let update = data.split("'")[1]
         fn(updateCollection(update))
         break;
       case "server_version":
