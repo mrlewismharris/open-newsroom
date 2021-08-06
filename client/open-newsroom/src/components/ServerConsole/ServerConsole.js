@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import CloseIcon from '@material-ui/icons/Close';
 import './ServerConsole.css'
 import CommandPopper from "./CommandPopper";
+import { ContactSupportOutlined } from "@material-ui/icons";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   // @ts-ignore
@@ -24,7 +25,9 @@ export default function ServerConsole(props) {
   const [commandPopperAnchor, setCommandPopperAnchor] = useState(null)
   const [commandPopperContent, setCommandPopperContent] = useState([])
   
-  const [fetchedRemote, setFetchedRemote] = useState(false)  
+  const [fetchedRemote, setFetchedRemote] = useState(false)
+  const [typedMatchedCommand, setTypedMatchedCommand] = useState([])
+  const [typedMatchedCommandIndex, setTypedMatchedCommandIndex] = useState(0)
   const [dictionary, setDictionary] = useState([])
   let localDictionary = [
     {command: "client_version", description: "Returns Open Newsroom version(s)", locale: "local",
@@ -72,6 +75,20 @@ export default function ServerConsole(props) {
     }
   }
 
+  function completeFunctionName() {
+    if (typedMatchedCommand.length === 0) {
+      return false
+    } else {
+      let selectedCommand = typedMatchedCommand[typedMatchedCommand.length-1-typedMatchedCommandIndex].command
+      if (typedMatchedCommandIndex === typedMatchedCommand.length-1) {
+        setTypedMatchedCommandIndex(0)
+      } else {
+        setTypedMatchedCommandIndex(typedMatchedCommandIndex+1)
+      }
+      return selectedCommand
+    }
+  }
+
   function closeConsole() {
     setServerConsole(initialConsole)
     props.onClose()
@@ -88,14 +105,16 @@ export default function ServerConsole(props) {
   }
 
   function sniffCommand(event) {
+    setTypedMatchedCommandIndex(0)
     getRemoteDictionary()
     if (!previewCommands) return
     let input = event.target.value
     if (input.includes(" ")) {input = input.split(" ")[0]}
     let searchedArray = []
     dictionary.forEach(item => {
-      if (item.command.includes(input)) {
-        searchedArray.push(item)
+      if (item.command.includes(`${input}`)) {
+        searchedArray.unshift(item)
+        setTypedMatchedCommand(searchedArray)
       }
     })
     setCommandPopperAnchor(event.currentTarget)
@@ -223,10 +242,15 @@ export default function ServerConsole(props) {
                 // @ts-ignore
                 e.target.value = commandHistoryHandlerDown()
               } else if (e.code === "Tab") {
-                e.preventDefault()  
+                e.preventDefault()
+                if (completeFunctionName()) {
+                  // @ts-ignore
+                  e.target.value = completeFunctionName()
+                }
               }
             }}
             onChange={(e) => {
+              setCommandHistoryIndex(-1)
               //sniffCommand(e.target.value)
               sniffCommand(e)
             }}
