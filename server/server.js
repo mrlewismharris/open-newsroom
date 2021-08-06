@@ -19,8 +19,10 @@ const dictionary = [
     args: "None"},
   {command: "collection_read", description: "Read and return the prefabs.json file (if exists)", locale: "remote",
     args: "None"},
+  {command: "collection_update", description: "Update the prefabs.json file (if exists)", locale: "remote",
+      args: "None"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote",
-    args: "None"},
+    args: "1: The new prefab.json contents (must be in quotes)"},
   {command: "server_test", description: "Test connection to the server", locale: "remote",
     args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote",
@@ -60,11 +62,26 @@ function createCollection() {
 
 //read json file containing prefab collections
 function readCollection() {
-  return "readCollection() fired"
+  let fsDir = fs.readdirSync('fs')
+  if (fsDir.includes("prefabs.json")) {
+    return fs.readFileSync('fs/prefabs.json', {encoding:'utf8'})
+  } else {
+    return "prefabs.json doesn't exist"
+  }
 }
 
-function updateCollection() {
-
+function updateCollection(data) {
+  if (data == "") {
+    return "New prefab was empty"
+  } else {
+    let fsDir = fs.readdirSync('fs')
+    if (fsDir.includes("prefabs.json")) {
+      fs.writeFileSync('fs/prefabs.json', data, {encoding: "utf8"})
+      return "prefabs.json successfully updated"
+    } else {
+      return "prefabs.json doesn't exist, create it first"
+    }
+  }
 }
 
 function deleteCollection() {
@@ -98,6 +115,10 @@ io.on('connect', (socket) => {
         break;
       case "collection_read":
         fn(readCollection())
+        break;
+      case "collection_update":
+        let update = data.split('"')[1]
+        fn(updateCollection(update))
         break;
       case "server_version":
         fn(`Server Version: v${version}`)
