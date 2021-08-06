@@ -110,15 +110,12 @@ function createFolder(folderName) {
       tempCollection.folders = []
       extraOutput = " (folder key wasn't present in object - created and added)"
     } else {
-      console.log(tempCollection.folders)
       if (tempCollection.folders.includes(folderName)) {
-        console.log(`folder ${folderName} already exists`)
         folderExists = true
       }
     }
     if (!folderExists) {
       tempCollection.folders.push(folderName)
-      console.log(tempCollection)
       updateCollection(JSON.stringify(tempCollection))
       return "Folder added successfully to prefabs.json" + extraOutput
     } else {
