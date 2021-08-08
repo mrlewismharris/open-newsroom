@@ -22,9 +22,9 @@ const dictionary = [
   {command: "collection_read", description: "Read and return the prefabs.json file (if exists)", locale: "remote", args: "None"},
   {command: "collection_update", description: "Update the prefabs.json file (if exists)", locale: "remote", args: "1: The new prefab.json contents (must be in 'single quotes')"},
   {command: "collection_delete", description: "Delete the prefabs.json file", locale: "remote", args: "None"},
-  {command: "collection_reset", description: "Reset the prefab.json file to default skeleton (creates new if doesn't exist)", locale: "remote", args: "None"},
+  {command: "collection_reset", description: "Reset the prefabs.json file to default skeleton (creates new if doesn't exist)", locale: "remote", args: "None"},
   //folder CRUD (for creating prefab folders within prefab.json)
-  {command: "folder_add", description: "Create a new folder in prefab.json", locale: "remote", args: "1: The folder's name (must be in 'single quotes')"},
+  {command: "folder_add", description: "Create a new folder in prefabs.json", locale: "remote", args: "1: The folder's name (must be in 'single quotes')"},
   {command: "folder_read", description: "Returns all folders", locale: "remote", args: "None"},
   {command: "folder_update", description: "Update the list of folders", locale: "remote", args: "1: Folder list (must be seperated by comma and inside 'single, quotes')"},
   {command: "folder_delete", description: "Delete specified folder from list", locale: "remote", args: "1: Folder name (must be in 'single quotes')"},
@@ -110,7 +110,7 @@ function folderAdd(folderName) {
   } else {
     let collection = collectionRead()
     if (collection == false) {
-      throw "Folder could not be created, prefab.json does not exist"
+      throw "Folder could not be created, prefabs.json does not exist"
     } else {
       let folderExists = false
       let tempCollection = JSON.parse(collection)
@@ -126,7 +126,7 @@ function folderAdd(folderName) {
         collectionUpdate(JSON.stringify(tempCollection, null, 2))
         return true
       } else {
-        throw "Folder already exists in prefab.json"
+        throw "Folder already exists in prefabs.json"
       }
     }
   }
@@ -135,7 +135,7 @@ function folderAdd(folderName) {
 function folderRead() {
   let collection = collectionRead()
   if (collection == false) {
-    throw "Prefab.json does not exist"
+    throw "Prefabs.json does not exist"
   } else {
     collection = JSON.parse(collection)
     if (collection.folders == undefined) {
@@ -169,7 +169,7 @@ function folderUpdate(data) {
 function folderDelete(folderName) {
   let collection = collectionRead()
   if (collection == false) {
-    throw "Folder could not be read, prefab.json does not exist"
+    throw "Folder could not be read, prefabs.json does not exist"
   } else {
     collection = JSON.parse(collection)
     const folderIndex = collection.folders.indexOf(folderName)
@@ -208,9 +208,9 @@ io.on('connect', (socket) => {
       //collection CRUD (json containing prefabs)
       case "collection_create":
         if (collectionCreate()) {
-          fn(`Default "~/server/fs/prefab.json" file created`)
+          fn(`Default "~/server/fs/prefabs.json" file created`)
         } else {
-          fn("prefab.json file already exists")
+          fn("prefabs.json file already exists")
         }
         break;
       case "collection_read":
@@ -245,6 +245,10 @@ io.on('connect', (socket) => {
         break;
       //create folders CRUD
       case "folder_add":
+        if (data.indexOf("'") == -1) {
+          fn("Failed: You must specify a folder name as an argument")
+          return
+        }
         folderName = data.split("'")[1]
         try {
           if (folderAdd(folderName)) {
@@ -265,6 +269,10 @@ io.on('connect', (socket) => {
         }
         break;
       case "folder_update":
+        if (data.indexOf("'") == -1) {
+          fn("Failed: You must specify a new list to update folder list with")
+          return
+        }
         let newData = data.split("'")[1]
         try {
           if (folderUpdate(newData)) {
@@ -275,6 +283,10 @@ io.on('connect', (socket) => {
         }
         break;
       case "folder_delete":
+        if (data.indexOf("'") == -1) {
+          fn("Failed: You must specify a folder name as an argument")
+          return
+        }
         folderName = data.split("'")[1]
         try {
           if (folderDelete(folderName)) {
@@ -286,6 +298,18 @@ io.on('connect', (socket) => {
         break;
       //prefab CRUD
       case "prefab_add":
+        if (data.indexOf("'") == -1) {
+          fn("Failed: You must specify a prefab object (stringified)")
+          return
+        }
+        try {
+          element = data.split("'")[1]
+          if (prefabAdd(element)) {
+            fn("New prefab added to prefabs.json file")
+          }
+        } catch(err) {
+          fn(err)
+        }
         fn("Not yet implemented")
         break;
       case "prefab_read":
