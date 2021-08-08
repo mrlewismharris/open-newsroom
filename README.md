@@ -12,6 +12,11 @@ Ypu're early so please don't expect anything too serious yet!
 * Add "save scene" to save scenes and their info to json file
 * Import scenes - select a json file and import scenes a folders into that JSON file (should merge folders together, or give choice)
 * Add "Quick settings" checkbox next to any setting when making a prefab, so users can indicate and add custom labels to specific settings to be editted when using a prefab, e.g. "Header Text" next to a text element, "Background Colour", etc. These will be in-fact NECESSARY for users, so that when they add an element it doesn't display placeholder data, but actual replacement text.
+* Elements to add:
+  * Container element (a container for other elements to sit inside of - possibly just use another prefab?)
+  * Basic elements (text, box, image, video)
+* Add transitions to all elements and between prefabs
+* Save transitions to apply over many different elements
 * Logging for server events
 
 ## Future Ideas:
