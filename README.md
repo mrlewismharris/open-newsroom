@@ -1,16 +1,17 @@
 # open-newsroom
-Open Newsroom for OBS
+A server and webapp for creating complex scenes for OBS to use with the browser source (or any software with a browser source alternative). To be used as a more responsive alternative, especially for larger scale events, to composite prefabricated graphics and overlays
 
 ## Still WIP
-An "Open Newsroom" app, will have advanced features to create complex prefab templates to display on the OBS stream. Still extremely early so please don't expect anything too serious yet!
-
-Watch this space!
+Ypu're early so please don't expect anything too serious yet!
 
 ## Todo:
 * Server Console command implementation
  * Server-side: CRUD json (containing prefab collections), CRUD for each prefab collection, CRUD for each prefab, CRUD for each element within the prefab collection? (Maybe doesn't need to be this decomposed? Will think about it)
 * Get current scene and display on "/obs" page on refresh
-* Add "save scene" to save scenes and their info to text file
+* Timeline functionality to traverse scenes (forward/back/jump-to)
+* Add "save scene" to save scenes and their info to json file
+* Import scenes - select a json file and import scenes a folders into that JSON file (should merge folders together, or give choice)
+* Add "Quick settings" checkbox next to any setting when making a prefab, so users can indicate and add custom labels to specific settings to be editted when using a prefab, e.g. "Header Text" next to a text element, "Background Colour", etc. These will be in-fact NECESSARY for users, so that when they add an element it doesn't display placeholder data, but actual replacement text.
 * Logging for server events
 
 ## Future Ideas:
