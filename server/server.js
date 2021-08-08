@@ -12,25 +12,22 @@ let serverFirstRun = true;
 let collectionName = "";
 let ini;
 
-let version = "0.0.1";
+//constants and defaults
+const version = "0.0.1";
+const defaultPrefabJson = {"folders":[],"prefabs":[]}
 
 const dictionary = [
-  {command: "collection_create", description: "Create prefabs.json file (if doesn't already exists)", locale: "remote",
-    args: "None"},
-  {command: "collection_read", description: "Read and return the prefabs.json file (if exists)", locale: "remote",
-    args: "None"},
-  {command: "collection_update", description: "Update the prefabs.json file (if exists)", locale: "remote",
-      args: "1: The new prefab.json contents (must be in 'single quotes')"},
-  {command: "collection_delete", description: "Delete the prefabs.json file", locale: "remote",
-    args: "None"},
-  {command: "folder_create", description: "Create a new folder to add prefabs to", locale: "remote",
-    args: "1: The folder's name (must be in 'single quotes')"},
-  {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote",
-    args: "None"},
-  {command: "server_test", description: "Test connection to the server", locale: "remote",
-    args: "None"},
-  {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote",
-      args: "None"},
+  //collection CRUD (for prefab.json)
+  {command: "collection_create", description: "Create prefabs.json file (if doesn't already exists)", locale: "remote", args: "None"},
+  {command: "collection_read", description: "Read and return the prefabs.json file (if exists)", locale: "remote", args: "None"},
+  {command: "collection_update", description: "Update the prefabs.json file (if exists)", locale: "remote", args: "1: The new prefab.json contents (must be in 'single quotes')"},
+  {command: "collection_delete", description: "Delete the prefabs.json file", locale: "remote", args: "None"},
+  //folder CRUD (for creating prefab folders within prefab.json)
+  {command: "folder_create", description: "Create a new folder to add prefabs to", locale: "remote", args: "1: The folder's name (must be in 'single quotes')"},
+  {command: "folder_read", description: "Return all the current folders", locale: "remote", args: "None"},
+  {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
+  {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
+  {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote", args: "None"},
 ]
 
 fs.access("settings.ini", fs.F_OK, (err) => {
@@ -59,7 +56,7 @@ function createCollection() {
   if (fsDir.includes("prefabs.json")) {
     return "prefabs.json already exists"
   } else {
-    fs.writeFileSync('fs/prefabs.json', '{}')
+    fs.writeFileSync('fs/prefabs.json', JSON.stringify(defaultPrefabJson, null, 2))
     return "prefabs.json created"
   }
 }
@@ -93,7 +90,7 @@ function deleteCollection() {
     fs.unlinkSync('fs/prefabs.json')
     return "prefabs.json successfully deleted"
   } else {
-    return "prefabs.json doesn't existm, could not delete"
+    return "prefabs.json doesn't exist, could not delete"
   }
 }
 
