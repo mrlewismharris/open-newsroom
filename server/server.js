@@ -25,6 +25,7 @@ const dictionary = [
   //folder CRUD (for creating prefab folders within prefab.json)
   {command: "folder_create", description: "Create a new folder to add prefabs to", locale: "remote", args: "1: The folder's name (must be in 'single quotes')"},
   {command: "folder_read", description: "Returns all folders", locale: "remote", args: "None"},
+  {command: "folder_update", description: "Update the list of folders", locale: "remote", args: "1: Folder list (must be seperated by comma and inside 'single, quotes')"},
   {command: "folder_delete", description: "Delete specified folder from list", locale: "remote", args: "1: Folder name (must be in 'single quotes')"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
@@ -132,13 +133,21 @@ function readFolders() {
   }
 }
 
-function updateFolders(folderList) {
-  let collection = readCollection()
-  if (collection == false) {
-    return "Folder could not be read, prefab.json does not exist"
+function updateFolders(data) {
+  if (data == "" || data == undefined) {
+    return "Argument was empty"
   } else {
-    collection = JSON.parse(collection)
-    return collection.folders
+    let splitData = data.split(",")
+    let uniqueData = []
+    for (var i=0;i<splitData.length;i++) {
+      if (!uniqueData.includes(splitData[i].trim())) {
+        uniqueData.push(splitData[i].trim())
+      }
+    }
+    let collection = JSON.parse(readCollection())
+    collection.folders = uniqueData
+    updateCollection(JSON.stringify(collection, null, 2))
+    return "prefab.json folders updated"
   }
 }
 
@@ -208,7 +217,8 @@ io.on('connect', (socket) => {
         fn(readFolders())
         break;
       case "folder_update":
-        fn("Not yet implemented")
+        let newData = data.split("'")[1]
+        fn(updateFolders(newData))
         break;
       case "folder_delete":
         folderName = data.split("'")[1]
