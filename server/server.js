@@ -97,7 +97,7 @@ function deleteCollection() {
 }
 
 //CRUD for folders within the prefabs.json file
-function createFolder(folderName) {
+function addFolder(folderName) {
   let collection = readCollection()
   if (collection == false) {
     return "Folder could not be created, prefab.json does not exist"
@@ -209,9 +209,9 @@ io.on('connect', (socket) => {
         fn(deleteCollection())
         break;
       //create folders CRUD
-      case "folder_create":
+      case "folder_add":
         folderName = data.split("'")[1]
-        fn(createFolder(folderName))
+        fn(addFolder(folderName))
         break;
       case "folder_read":
         fn(readFolders())
@@ -224,6 +224,7 @@ io.on('connect', (socket) => {
         folderName = data.split("'")[1]
         fn(deleteFolder(folderName))
         break;
+      //prefab CRUD
 
       case "server_version":
         fn(`Server Version: v${version}`)
