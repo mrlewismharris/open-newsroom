@@ -24,7 +24,8 @@ const dictionary = [
   {command: "collection_delete", description: "Delete the prefabs.json file", locale: "remote", args: "None"},
   //folder CRUD (for creating prefab folders within prefab.json)
   {command: "folder_create", description: "Create a new folder to add prefabs to", locale: "remote", args: "1: The folder's name (must be in 'single quotes')"},
-  {command: "folder_read", description: "Return all the current folders", locale: "remote", args: "None"},
+  {command: "folder_read", description: "Returns all folders", locale: "remote", args: "None"},
+  {command: "folder_delete", description: "Delete specified folder from list", locale: "remote", args: "1: Folder name (must be in 'single quotes')"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote", args: "None"},
@@ -113,7 +114,7 @@ function createFolder(folderName) {
     }
     if (!folderExists) {
       tempCollection.folders.push(folderName)
-      updateCollection(JSON.stringify(tempCollection))
+      updateCollection(JSON.stringify(tempCollection, null, 2))
       return "Folder added successfully to prefabs.json" + extraOutput
     } else {
       return "Folder already exists in prefab.json"
@@ -122,15 +123,40 @@ function createFolder(folderName) {
 }
 
 function readFolders() {
-
+  let collection = readCollection()
+  if (collection == false) {
+    return "Folder could not be read, prefab.json does not exist"
+  } else {
+    collection = JSON.parse(collection)
+    return collection.folders
+  }
 }
 
 function updateFolders(folderList) {
-
+  let collection = readCollection()
+  if (collection == false) {
+    return "Folder could not be read, prefab.json does not exist"
+  } else {
+    collection = JSON.parse(collection)
+    return collection.folders
+  }
 }
 
 function deleteFolder(folderName) {
-
+  let collection = readCollection()
+  if (collection == false) {
+    return "Folder could not be read, prefab.json does not exist"
+  } else {
+    collection = JSON.parse(collection)
+    const folderIndex = collection.folders.indexOf(folderName)
+    if (folderIndex > -1) {
+      collection.folders.splice(folderIndex, 1)
+      updateCollection(JSON.stringify(collection, null, 2))
+      return `Folder "${folderName}" successfully deleted from folders list`
+    } else {
+      return `Folder "${folderName}" does not exist in folders list`
+    }
+  }
 }
 
 io.on('connect', (socket) => {
@@ -153,6 +179,7 @@ io.on('connect', (socket) => {
       trimmedData = trimmedData.split(" ")[0]
     }
     let redactedParamsMessage = "Additional parameters redacted before execution.\n"
+    let folderName = "";
     switch(trimmedData) {
       //collection CRUD (json containing prefabs)
       case "collection_create":
@@ -174,17 +201,18 @@ io.on('connect', (socket) => {
         break;
       //create folders CRUD
       case "folder_create":
-        let folderName = data.split("'")[1]
+        folderName = data.split("'")[1]
         fn(createFolder(folderName))
         break;
       case "folder_read":
-        fn("Not yet implemented")
+        fn(readFolders())
         break;
       case "folder_update":
         fn("Not yet implemented")
         break;
       case "folder_delete":
-        fn("Not yet implemented")
+        folderName = data.split("'")[1]
+        fn(deleteFolder(folderName))
         break;
 
       case "server_version":
