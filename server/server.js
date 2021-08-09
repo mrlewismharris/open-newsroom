@@ -251,11 +251,21 @@ function prefabAdd(prefab) {
 }
 
 function prefabReadAll() {
-
+  let prefabList = JSON.parse(collectionRead()).prefabs
+  if (prefabList.length == 0) {
+    throw "Prefab list empty"
+  } else {
+    return prefabList
+  }
 }
 
 function prefabRead(name) {
-
+  let prefabList = JSON.parse(collectionRead()).prefabs
+  if (prefabList.find(prefab => prefab.name == name)) {
+    return prefabList.find(prefab => prefab.name == name)
+  } else {
+    throw "Prefab name does not exist"
+  }
 }
 
 function prefabUpdate(prefabObject) {
@@ -396,6 +406,25 @@ io.on('connect', (socket) => {
         fn("Not yet implemented")
         break;
       case "prefab_read":
+        if (data.indexOf("'") == -1) {
+          try {
+            let out = prefabReadAll()
+            if (out !== false) {
+              fn(out)
+            }
+          } catch (err) {
+            fn(err)
+          }
+        } else {
+          try {
+            let out = JSON.stringify(prefabRead(data.split("'")[1]), null, 2)
+            if (out !== false) {
+              fn(out)
+            }
+          } catch (err) {
+            fn(err)
+          }
+        }
         fn("Not yet implemented")
         break;
       case "prefab_update":
