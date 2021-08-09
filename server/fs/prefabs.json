@@ -15,6 +15,12 @@
       "css": {
         "background-color": "#fff"
       }
+    },
+    {
+      "name": "test2",
+      "type": "text",
+      "folder": "folder1",
+      "css": {}
     }
   ],
   "folders": [

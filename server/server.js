@@ -235,7 +235,7 @@ function prefabAdd(prefab) {
           //check the type is valid from list
           if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
           //check the css is in a valid array
-          if (typeof prefabObject.css !== "object") {addError(`Invalid prefab CSS layout, must be in object - e.g. "css": {"background-color":"#fff"}`)}
+          if (typeof prefabObject.css !== "object") {addError(`Invalid prefab CSS layout, must be inline object - e.g. "css": {"background-color":"#fff"}`)}
           if (errors.length > 0) {
             throw errors
           } else {
