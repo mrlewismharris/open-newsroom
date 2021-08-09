@@ -15,6 +15,7 @@ let ini;
 //constants and defaults
 const version = "0.0.2";
 const defaultPrefabJson = {"folders":[],"prefabs":[]}
+const validPrefabTypes = ["text", "box", "image"]
 
 const dictionary = [
   //collection CRUD (for prefab.json)
@@ -28,6 +29,12 @@ const dictionary = [
   {command: "folder_read", description: "Returns all folders", locale: "remote", args: "None"},
   {command: "folder_update", description: "Update the list of folders", locale: "remote", args: "1: Folder list (must be seperated by comma and inside 'single, quotes')"},
   {command: "folder_delete", description: "Delete specified folder from list", locale: "remote", args: "1: Folder name (must be in 'single quotes')"},
+  //prefab CRUD (for adding individual prefab to prefab.json)
+  {command: "prefab_add", description: "Add prefab to prefabs.json", locale: "remote", args: `1: Stringified prefab object in 'single quotes', required: name, type, css, folder (folder can be empty ""). Optional: Prefab and element transition-references, children/sub-elements (for containers), quick settings list`},
+  {command: "prefab_read", description: "Returns a list of prefabs from prefab.json, or an individual prefab object as string when using prefab name as arg", locale: "remote", args: "(Optional) 1: Prefab name in 'single quotes'"},
+  {command: "prefab_update", description: "Update a specific prefab", locale: "remote", args: "1: Stringified prefab object in 'single quotes', same as prefab_add - prefab must already exist to update"},
+  {command: "prefab_delete", description: "Delete a prefab from prefabs.json", locale: "remote", args: "1: Prefab name in 'single quotes'"},
+
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote", args: "None"},
@@ -183,6 +190,82 @@ function folderDelete(folderName) {
   }
 }
 
+//CRUD functions for prefabs
+
+function prefabAdd(prefab) {
+  if (prefab == "") {
+    throw "Prefab name empty"
+  } else {
+    let collection = collectionRead()
+    if (collection == false) {
+      throw "Folder could not be created, prefabs.json does not exist"
+    } else if (!JSON.parse(collection).hasOwnProperty("prefabs")) {
+      throw "Prefabs.json is not formatted corrently (needs 'prefabs' property)"
+    } else {
+      let prefabObject = JSON.parse(prefab)
+      let errors = ""
+      function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
+      //check if the prefab object has required fields
+      if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
+      if (!prefabObject.hasOwnProperty("type")) {addError("Prefab must have a type field")}
+      if (!prefabObject.hasOwnProperty("css")) {addError("Prefab must have a CSS field")}
+      if (!prefabObject.hasOwnProperty("folder")) {addError("Prefab must have a folder field, but this can be empty")}
+      if (errors.length > 0) {
+        throw errors
+      } else {
+        //check make sure the required fields aren't empty
+        if (prefabObject.name == "") {addError("Prefab name field was empty")}
+        if (prefabObject.type == "") {addError("Prefab type field was empty")}
+        if (prefabObject.css == "") {addError("Prefab css field was empty")}
+        //check folder, if not empty, exists - if not - create it
+        if (prefabObject.folder !== "") {
+          if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
+            folderAdd(prefabObject.folder)
+          }
+        }
+        if (errors.length > 0) {
+          throw errors
+        } else {
+          //validate the fields for correct format
+          //check prefab doesn't already exist in prefabs.json, get list of existing prefab names
+          let existingPrefabs = JSON.parse(collection).prefabs.map((val) => {
+            return val.name
+          })
+          if (existingPrefabs.includes(prefabObject.name)) {addError("Prefab name already exists")}
+          //check the type is valid from list
+          if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
+          //check the css is in a valid array
+          if (typeof prefabObject.css !== "object") {addError(`Invalid prefab CSS layout, must be in object - e.g. "css": {"background-color":"#fff"}`)}
+          if (errors.length > 0) {
+            throw errors
+          } else {
+            let tempCollection = JSON.parse(collection)
+            tempCollection.prefabs.push(prefabObject)
+            collectionUpdate(JSON.stringify(tempCollection, null, 2))
+            return true
+          }
+        }
+      }
+    }
+  }
+}
+
+function prefabReadAll() {
+
+}
+
+function prefabRead(name) {
+
+}
+
+function prefabUpdate(prefabObject) {
+
+}
+
+function prefabDelete(name) {
+
+}
+
 io.on('connect', (socket) => {
 
   //return the command dictionary
@@ -305,7 +388,7 @@ io.on('connect', (socket) => {
         try {
           element = data.split("'")[1]
           if (prefabAdd(element)) {
-            fn("New prefab added to prefabs.json file")
+            fn(`New prefab ${JSON.parse(element).name} added to prefabs.json file`)
           }
         } catch(err) {
           fn(err)

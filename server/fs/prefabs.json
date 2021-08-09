@@ -1,4 +1,24 @@
 {
-  "prefabs": [],
-  "folders": []
+  "prefabs": [
+    {
+      "name": "test",
+      "type": "text",
+      "folder": "folder1",
+      "css": {
+        "background-color": "#fff"
+      }
+    },
+    {
+      "name": "test1",
+      "type": "text",
+      "folder": "folder1",
+      "css": {
+        "background-color": "#fff"
+      }
+    }
+  ],
+  "folders": [
+    "test",
+    "folder1"
+  ]
 }
