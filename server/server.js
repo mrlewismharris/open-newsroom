@@ -377,12 +377,10 @@ io.on('connect', (socket) => {
         } else {
           try {
             let out = folderRead(data.split("'")[1])
-            console.log(out)
             if (out !== false) {
               fn(JSON.stringify(out))
             }
           } catch (err) {
-            console.log(err)
             fn(err)
           }
         }
