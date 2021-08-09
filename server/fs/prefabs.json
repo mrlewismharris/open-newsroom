@@ -1,8 +1,18 @@
 {
-  "folders": [],
+  "folders": [
+    "folder1"
+  ],
   "prefabs": [
     {
       "name": "prefab",
+      "type": "text",
+      "folder": "folder1",
+      "css": {
+        "background-color": "#fff"
+      }
+    },
+    {
+      "name": "prefab1",
       "type": "text",
       "folder": "folder1",
       "css": {

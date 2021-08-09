@@ -26,7 +26,7 @@ const dictionary = [
   {command: "collection_reset", description: "Reset the prefabs.json file to default skeleton (creates new if doesn't exist)", locale: "remote", args: "None"},
   //folder CRUD (for creating prefab folders within prefab.json)
   {command: "folder_add", description: "Create a new folder in prefabs.json", locale: "remote", args: "1: The folder's name (must be in 'single quotes')"},
-  {command: "folder_read", description: "Returns all folders", locale: "remote", args: "None"},
+  {command: "folder_read", description: "Returns all folders, unless a folder name is specified", locale: "remote", args: "(Optional) 1: Folder name in 'single quotes'"},
   {command: "folder_update", description: "Update the list of folders", locale: "remote", args: "1: Folder list (must be seperated by comma and inside 'single, quotes')"},
   {command: "folder_delete", description: "Delete specified folder from list", locale: "remote", args: "1: Folder name (must be in 'single quotes')"},
   //prefab CRUD (for adding individual prefab to prefab.json)
@@ -139,7 +139,7 @@ function folderAdd(folderName) {
   }
 }
 
-function folderRead() {
+function folderReadAll() {
   let collection = collectionRead()
   if (collection == false) {
     throw "Prefabs.json does not exist"
@@ -152,6 +152,21 @@ function folderRead() {
       throw "Folder list empty"
     }
     return collection.folders
+  }
+}
+
+function folderRead(foldername) {
+  try {
+    let folders = folderReadAll()
+    if (folders) {
+      if (folders.includes(foldername)) {
+        return JSON.parse(collectionRead()).prefabs.filter(prefab => prefab.folder == foldername).map(prefab => prefab.name)
+      } else {
+        throw "Folder name does not exist"
+      }
+    }
+  } catch (err) {
+    throw err
   }
 }
 
@@ -228,9 +243,7 @@ function prefabAdd(prefab) {
         } else {
           //validate the fields for correct format
           //check prefab doesn't already exist in prefabs.json, get list of existing prefab names
-          let existingPrefabs = JSON.parse(collection).prefabs.map((val) => {
-            return val.name
-          })
+          let existingPrefabs = JSON.parse(collection).prefabs.map(prefab => prefab.name)
           if (existingPrefabs.includes(prefabObject.name)) {addError("Prefab name already exists")}
           //check the type is valid from list
           if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
@@ -255,7 +268,7 @@ function prefabReadAll() {
   if (prefabList.length == 0) {
     throw "Prefab list empty"
   } else {
-    return prefabList
+    return prefabList.map(prefab => prefab.name)
   }
 }
 
@@ -352,13 +365,26 @@ io.on('connect', (socket) => {
         }
         break;
       case "folder_read":
-        try {
-          let tempReply = folderRead()
-          if (tempReply!==false) {
-            fn(JSON.stringify(tempReply))
+        if (data.indexOf("'") == -1) {
+          try {
+            let tempReply = folderReadAll()
+            if (tempReply!==false) {
+              fn(JSON.stringify(tempReply))
+            }
+          } catch (err) {
+            fn(err)
           }
-        } catch (err) {
-          fn(err)
+        } else {
+          try {
+            let out = folderRead(data.split("'")[1])
+            console.log(out)
+            if (out !== false) {
+              fn(JSON.stringify(out))
+            }
+          } catch (err) {
+            console.log(err)
+            fn(err)
+          }
         }
         break;
       case "folder_update":
@@ -408,7 +434,7 @@ io.on('connect', (socket) => {
       case "prefab_read":
         if (data.indexOf("'") == -1) {
           try {
-            let out = prefabReadAll()
+            let out = JSON.stringify(prefabReadAll())
             if (out !== false) {
               fn(out)
             }
@@ -425,7 +451,6 @@ io.on('connect', (socket) => {
             fn(err)
           }
         }
-        fn("Not yet implemented")
         break;
       case "prefab_update":
         fn("Not yet implemented")
