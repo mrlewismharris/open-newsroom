@@ -223,7 +223,7 @@ function prefabAdd(prefab) {
       //check if the prefab object has required fields
       if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
       if (!prefabObject.hasOwnProperty("type")) {addError("Prefab must have a type field")}
-      if (!prefabObject.hasOwnProperty("css")) {addError("Prefab must have a CSS field")}
+      if (!prefabObject.hasOwnProperty("elements")) {addError("Prefab must have an elements field")}
       if (!prefabObject.hasOwnProperty("folder")) {addError("Prefab must have a folder field, but this can be empty")}
       if (errors.length > 0) {
         throw errors
@@ -231,7 +231,6 @@ function prefabAdd(prefab) {
         //check make sure the required fields aren't empty
         if (prefabObject.name == "") {addError("Prefab name field was empty")}
         if (prefabObject.type == "") {addError("Prefab type field was empty")}
-        if (prefabObject.css == "") {addError("Prefab css field was empty")}
         //check folder, if not empty, exists - if not - create it
         if (prefabObject.folder !== "") {
           if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
@@ -249,8 +248,8 @@ function prefabAdd(prefab) {
           if (existingPrefabs.includes(prefabObject.name)) {addError("Prefab name already exists")}
           //check the type is valid from list
           if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
-          //check the css is in a valid array
-          if (typeof prefabObject.css !== "object") {addError(`Invalid prefab CSS layout, must be inline object - e.g. "css": {"background-color":"#fff"}`)}
+          //check the elements is a valid array
+          if (!Array.isArray(prefabObject.elements)) {addError(`Invalid "elements" property, must be array`)}
           if (errors.length > 0) {
             throw errors
           } else {
@@ -299,7 +298,7 @@ function prefabUpdate(prefab) {
       //check if the prefab object has required fields
       if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
       if (!prefabObject.hasOwnProperty("type")) {addError("Prefab must have a type field")}
-      if (!prefabObject.hasOwnProperty("css")) {addError("Prefab must have a CSS field")}
+      if (!prefabObject.hasOwnProperty("elements")) {addError("Prefab must have an elements field")}
       if (!prefabObject.hasOwnProperty("folder")) {addError("Prefab must have a folder field, but this can be empty")}
       if (errors.length > 0) {
         throw errors
@@ -307,7 +306,6 @@ function prefabUpdate(prefab) {
         //check make sure the required fields aren't empty
         if (prefabObject.name == "") {addError("Prefab name field was empty")}
         if (prefabObject.type == "") {addError("Prefab type field was empty")}
-        if (prefabObject.css == "") {addError("Prefab css field was empty")}
         //check folder, if not empty, exists - if not - create it
         if (prefabObject.folder !== "") {
           if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
@@ -325,8 +323,8 @@ function prefabUpdate(prefab) {
           if (!existingPrefabs.includes(prefabObject.name)) {addError("Prefab doesn't exists - couldn't update")}
           //check the type is valid from list
           if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
-          //check the css is in a valid array
-          if (typeof prefabObject.css !== "object") {addError(`Invalid prefab CSS layout, must be inline object - e.g. "css": {"background-color":"#fff"}`)}
+          //check the elements is a valid array
+          if (!Array.isArray(prefabObject.elements)) {addError(`Invalid "elements" property, must be array`)}
           if (errors.length > 0) {
             throw errors
           } else {
@@ -493,6 +491,7 @@ io.on('connect', (socket) => {
             fn(`New prefab ${JSON.parse(element).name} added to prefabs.json file`)
           }
         } catch(err) {
+          console.log(err)
           fn(err)
         }
         fn("Not yet implemented")
