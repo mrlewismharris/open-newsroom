@@ -1,0 +1,5 @@
+server console commands:
+
+Prefab add, with specific prefab object:
+
+prefab_add '{"name":"prefab3","type":"text","folder":"folder3","elements":[]}'
