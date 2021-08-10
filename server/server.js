@@ -343,7 +343,18 @@ function prefabUpdate(prefab) {
 }
 
 function prefabDelete(name) {
-
+  if (name == "") {
+    throw "Prefab name was empty"
+  } else {
+    let tempCollection = JSON.parse(collectionRead())
+    if (!tempCollection.prefabs.find(prefab => prefab.name == name)) {
+      throw `Prefab with name "${name}" doesn't exist`
+    } else {
+      tempCollection.prefabs = tempCollection.prefabs.filter(prefab => prefab.name !== name)
+      collectionUpdate(JSON.stringify(tempCollection, null, 2))
+      return true
+    }
+  }
 }
 
 io.on('connect', (socket) => {
@@ -514,7 +525,6 @@ io.on('connect', (socket) => {
               fn(`Prefab "${JSON.parse(data.split("'")[1]).name}" updated successfully`)
             }
           } catch(err) {
-            console.log(err)
             fn(err)
           }
         } else {
@@ -522,6 +532,17 @@ io.on('connect', (socket) => {
         }
         break;
       case "prefab_delete":
+        if (data.indexOf("'") > -1) {
+          try {
+            if (prefabDelete(data.split("'")[1])) {
+              fn(`Prefab "${data.split("'")[1]}" successfully deleted`)
+            }
+          } catch (err) {
+            fn(err)
+          }
+        } else {
+          fn("prefab_delete requires a prefab name as an argument (in 'single quotes')")
+        }
         fn("Not yet implemented")
         break;
       case "server_version":
