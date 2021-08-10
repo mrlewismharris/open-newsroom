@@ -236,6 +236,8 @@ function prefabAdd(prefab) {
         if (prefabObject.folder !== "") {
           if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
             folderAdd(prefabObject.folder)
+            //need to update the collection var after updating the folder list
+            collection = collectionRead()
           }
         }
         if (errors.length > 0) {
@@ -281,8 +283,63 @@ function prefabRead(name) {
   }
 }
 
-function prefabUpdate(prefabObject) {
-
+function prefabUpdate(prefab) {
+  if (prefab == "") {
+    throw "Prefab was empty"
+  } else {
+    let collection = collectionRead()
+    if (collection == false) {
+      throw "Folder could not be created, prefabs.json does not exist"
+    } else if (!JSON.parse(collection).hasOwnProperty("prefabs")) {
+      throw "Prefabs.json is not formatted corrently (needs 'prefabs' property)"
+    } else {
+      let prefabObject = JSON.parse(prefab)
+      let errors = ""
+      function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
+      //check if the prefab object has required fields
+      if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
+      if (!prefabObject.hasOwnProperty("type")) {addError("Prefab must have a type field")}
+      if (!prefabObject.hasOwnProperty("css")) {addError("Prefab must have a CSS field")}
+      if (!prefabObject.hasOwnProperty("folder")) {addError("Prefab must have a folder field, but this can be empty")}
+      if (errors.length > 0) {
+        throw errors
+      } else {
+        //check make sure the required fields aren't empty
+        if (prefabObject.name == "") {addError("Prefab name field was empty")}
+        if (prefabObject.type == "") {addError("Prefab type field was empty")}
+        if (prefabObject.css == "") {addError("Prefab css field was empty")}
+        //check folder, if not empty, exists - if not - create it
+        if (prefabObject.folder !== "") {
+          if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
+            folderAdd(prefabObject.folder)
+            //need to update the collection var after updating the folder list
+            collection = collectionRead()
+          }
+        }
+        if (errors.length > 0) {
+          throw errors
+        } else {
+          //validate the fields for correct format
+          //check prefab doesn't already exist in prefabs.json, get list of existing prefab names
+          let existingPrefabs = JSON.parse(collection).prefabs.map(prefab => prefab.name)
+          if (!existingPrefabs.includes(prefabObject.name)) {addError("Prefab doesn't exists - couldn't update")}
+          //check the type is valid from list
+          if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
+          //check the css is in a valid array
+          if (typeof prefabObject.css !== "object") {addError(`Invalid prefab CSS layout, must be inline object - e.g. "css": {"background-color":"#fff"}`)}
+          if (errors.length > 0) {
+            throw errors
+          } else {
+            let tempCollection = JSON.parse(collection)
+            tempCollection.prefabs = tempCollection.prefabs.filter(prefab => prefab.name !== prefabObject.name)
+            tempCollection.prefabs.push(prefabObject)
+            collectionUpdate(JSON.stringify(tempCollection, null, 2))
+            return true
+          }
+        }
+      }
+    }
+  }
 }
 
 function prefabDelete(name) {
@@ -451,7 +508,18 @@ io.on('connect', (socket) => {
         }
         break;
       case "prefab_update":
-        fn("Not yet implemented")
+        if (data.indexOf("'") > -1) {
+          try {
+            if (prefabUpdate(data.split("'")[1])) {
+              fn(`Prefab "${JSON.parse(data.split("'")[1]).name}" updated successfully`)
+            }
+          } catch(err) {
+            console.log(err)
+            fn(err)
+          }
+        } else {
+          fn("prefab_update requires the argument: prefab object in 'single quotes'")
+        }
         break;
       case "prefab_delete":
         fn("Not yet implemented")
