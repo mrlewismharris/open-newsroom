@@ -30,10 +30,11 @@ const dictionary = [
   {command: "folder_update", description: "Update the list of folders", locale: "remote", args: "1: Folder list (must be seperated by comma and inside 'single, quotes')"},
   {command: "folder_delete", description: "Delete specified folder from list", locale: "remote", args: "1: Folder name (must be in 'single quotes')"},
   //prefab CRUD (for adding individual prefab to prefab.json)
-  {command: "prefab_add", description: "Add prefab to prefabs.json", locale: "remote", args: `1: Stringified prefab object in 'single quotes', required: name, type, css, folder (folder can be empty ""). Optional: Prefab and element transition-references, children/sub-elements (for containers), quick settings list`},
+  {command: "prefab_add", description: "Add prefab to prefabs.json", locale: "remote", args: `1: Stringified prefab object in 'single quotes'. Name required, optional: Elements, folder, transition, quick settings list (quick)`},
   {command: "prefab_read", description: "Returns a list of prefabs from prefab.json, or an individual prefab object as string when using prefab name as arg", locale: "remote", args: "(Optional) 1: Prefab name in 'single quotes'"},
   {command: "prefab_update", description: "Update a specific prefab", locale: "remote", args: "1: Stringified prefab object in 'single quotes', same as prefab_add - prefab must already exist to update"},
   {command: "prefab_delete", description: "Delete a prefab from prefabs.json", locale: "remote", args: "1: Prefab name in 'single quotes'"},
+  {command: "prefab_validate", description: "Validate prefab", locale: "remote", args: "1: Prefab object in 'single quotes'"},
 
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
@@ -209,56 +210,24 @@ function folderDelete(folderName) {
 
 function prefabAdd(prefab) {
   if (prefab == "") {
-    throw "Prefab name empty"
+    throw "Prefab empty"
   } else {
     let collection = collectionRead()
     if (collection == false) {
-      throw "Folder could not be created, prefabs.json does not exist"
+      throw "Prefab could not be created, prefabs.json does not exist"
     } else if (!JSON.parse(collection).hasOwnProperty("prefabs")) {
       throw "Prefabs.json is not formatted corrently (needs 'prefabs' property)"
     } else {
-      let prefabObject = JSON.parse(prefab)
-      let errors = ""
-      function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
-      //check if the prefab object has required fields
-      if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
-      if (!prefabObject.hasOwnProperty("type")) {addError("Prefab must have a type field")}
-      if (!prefabObject.hasOwnProperty("elements")) {addError("Prefab must have an elements field")}
-      if (!prefabObject.hasOwnProperty("folder")) {addError("Prefab must have a folder field, but this can be empty")}
-      if (errors.length > 0) {
-        throw errors
-      } else {
-        //check make sure the required fields aren't empty
-        if (prefabObject.name == "") {addError("Prefab name field was empty")}
-        if (prefabObject.type == "") {addError("Prefab type field was empty")}
-        //check folder, if not empty, exists - if not - create it
-        if (prefabObject.folder !== "") {
-          if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
-            folderAdd(prefabObject.folder)
-            //need to update the collection var after updating the folder list
-            collection = collectionRead()
-          }
+      try {
+        let prefabObject = prefabValidate(prefab)
+        if (prefabObject) {
+          let tempCollection = JSON.parse(collectionRead())
+          tempCollection.prefabs.push(JSON.parse(prefabObject))
+          collectionUpdate(JSON.stringify(tempCollection, null, 2))
+          return true
         }
-        if (errors.length > 0) {
-          throw errors
-        } else {
-          //validate the fields for correct format
-          //check prefab doesn't already exist in prefabs.json, get list of existing prefab names
-          let existingPrefabs = JSON.parse(collection).prefabs.map(prefab => prefab.name)
-          if (existingPrefabs.includes(prefabObject.name)) {addError("Prefab name already exists")}
-          //check the type is valid from list
-          if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
-          //check the elements is a valid array
-          if (!Array.isArray(prefabObject.elements)) {addError(`Invalid "elements" property, must be array`)}
-          if (errors.length > 0) {
-            throw errors
-          } else {
-            let tempCollection = JSON.parse(collection)
-            tempCollection.prefabs.push(prefabObject)
-            collectionUpdate(JSON.stringify(tempCollection, null, 2))
-            return true
-          }
-        }
+      } catch (err) {
+        throw err
       }
     }
   }
@@ -292,49 +261,23 @@ function prefabUpdate(prefab) {
     } else if (!JSON.parse(collection).hasOwnProperty("prefabs")) {
       throw "Prefabs.json is not formatted corrently (needs 'prefabs' property)"
     } else {
-      let prefabObject = JSON.parse(prefab)
-      let errors = ""
-      function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
-      //check if the prefab object has required fields
-      if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
-      if (!prefabObject.hasOwnProperty("type")) {addError("Prefab must have a type field")}
-      if (!prefabObject.hasOwnProperty("elements")) {addError("Prefab must have an elements field")}
-      if (!prefabObject.hasOwnProperty("folder")) {addError("Prefab must have a folder field, but this can be empty")}
-      if (errors.length > 0) {
-        throw errors
-      } else {
-        //check make sure the required fields aren't empty
-        if (prefabObject.name == "") {addError("Prefab name field was empty")}
-        if (prefabObject.type == "") {addError("Prefab type field was empty")}
-        //check folder, if not empty, exists - if not - create it
-        if (prefabObject.folder !== "") {
-          if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
-            folderAdd(prefabObject.folder)
-            //need to update the collection var after updating the folder list
-            collection = collectionRead()
-          }
-        }
-        if (errors.length > 0) {
-          throw errors
-        } else {
-          //validate the fields for correct format
-          //check prefab doesn't already exist in prefabs.json, get list of existing prefab names
-          let existingPrefabs = JSON.parse(collection).prefabs.map(prefab => prefab.name)
-          if (!existingPrefabs.includes(prefabObject.name)) {addError("Prefab doesn't exists - couldn't update")}
-          //check the type is valid from list
-          if (!validPrefabTypes.includes(prefabObject.type)) {addError(`Invalid prefab type, valid types: ${validPrefabTypes.join(", ")}`)}
-          //check the elements is a valid array
-          if (!Array.isArray(prefabObject.elements)) {addError(`Invalid "elements" property, must be array`)}
-          if (errors.length > 0) {
-            throw errors
-          } else {
-            let tempCollection = JSON.parse(collection)
+      try {
+        let prefabObject = prefabValidate(prefab)
+        console.log(prefabObject)
+        if (prefabObject) {
+          prefabObject = JSON.parse(prefabObject)
+          let tempCollection = JSON.parse(collection)
+          if (tempCollection.prefabs.map(fab => fab.name == prefabObject.name).length > 0) {
             tempCollection.prefabs = tempCollection.prefabs.filter(prefab => prefab.name !== prefabObject.name)
             tempCollection.prefabs.push(prefabObject)
             collectionUpdate(JSON.stringify(tempCollection, null, 2))
             return true
+          } else {
+            throw `Prefab must exist first to be updated - no prefab with name "${prefabObject.name}" found`
           }
         }
+      } catch (err) {
+        throw err
       }
     }
   }
@@ -351,6 +294,82 @@ function prefabDelete(name) {
       tempCollection.prefabs = tempCollection.prefabs.filter(prefab => prefab.name !== name)
       collectionUpdate(JSON.stringify(tempCollection, null, 2))
       return true
+    }
+  }
+}
+
+function prefabValidate(prefab) {
+  let collection = collectionRead()
+  let prefabObject = JSON.parse(prefab)
+  let errors = ""
+  function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
+  if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
+  if (prefabObject.hasOwnProperty("elements")) {
+    if (prefabObject.elements.length > 0) {
+      //Do element validation here, loop thru elements and validate each in try/catch
+      prefabObject.elements.forEach(el => {
+        try {
+          //elementValidate(el)
+        } catch (err) {
+          addError(err)
+        }
+      })
+    }
+  } else {prefabObject.elements = []}
+  if (prefabObject.hasOwnProperty("folder")) {
+    if (prefabObject.folder !== "") {
+      if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
+        folderAdd(prefabObject.folder)
+        collection = collectionRead()
+      }
+    }
+  } else {prefabObject.folder = ""}
+  if (prefabObject.hasOwnProperty("transition")) {
+    if (prefabObject.transition !== "") {
+      //here validate that the transition ref exists
+      /**
+      if (collection.transitions.hasOwnProperty("transitions")) {
+        if (!collection.transition.includes(prefabObject.transition)) {
+          addError(`Transition reference ${prefabObject.transition} does not exist`)
+        }
+      } else {
+        addError("While checking transition reference was valid noticed prefab.json doesn't have a transition property - please add or use collection_reset (will delete all data)")
+      }
+      **/
+    }
+  } else {
+    prefabObject.transition = ""
+  }
+  if (!prefabObject.hasOwnProperty("quick")) {
+    prefabObject.quick = []
+  } else {
+    if (!Array.isArray(prefabObject.quick)) {
+      addError("Prefab quick settings item must be array")
+    } else {
+      //Make sure that the element exists to be set
+      let elementNameList = prefabObject.elements.map(el => el.name)
+      prefabObject.quick.forEach(setting => {
+        if (typeof setting == "string") {
+          if (!elementNameList.includes(setting)) {
+            addError(`Quick setting element ${setting} doesn't exist in prefab elements list`)
+          }
+        } else {
+          addError("Prefab's quick settings aren't properly formatted")
+        }
+      })
+    }
+  }
+  if (prefabObject.name == "") {addError("Prefab name field was empty")}
+  if (errors.length > 0) {
+    throw errors
+  } else {
+    //let existingPrefabs = JSON.parse(collection).prefabs.map(prefab => prefab.name)
+    //if (existingPrefabs.includes(prefabObject.name)) {addError("Prefab name already exists")}
+    if (!Array.isArray(prefabObject.elements)) {addError(`Invalid "elements" property, must be array`)}
+    if (errors.length > 0) {
+      throw errors
+    } else {
+      return JSON.stringify(prefabObject)
     }
   }
 }
@@ -542,7 +561,21 @@ io.on('connect', (socket) => {
         } else {
           fn("prefab_delete requires a prefab name as an argument (in 'single quotes')")
         }
-        fn("Not yet implemented")
+        break;
+      case "prefab_validate":
+        if (data.indexOf("'") > -1) {
+          try {
+            console.log(prefabValidate(data.split("'")[1]))
+            if (prefabValidate(data.split("'")[1])) {
+              fn("Prefab validated successfully")
+            }
+          } catch (err) {
+            console.log(err)
+            fn(`Prefab not valid: ${JSON.stringify(err)}`)
+          }
+        } else {
+          fn("prefab_validate requires a prefab object as an argument in 'single quotes'")
+        }
         break;
       case "server_version":
         fn(`Server Version: v${version}`)
