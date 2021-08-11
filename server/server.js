@@ -220,11 +220,17 @@ function prefabAdd(prefab) {
     } else {
       try {
         let prefabObject = prefabValidate(prefab)
-        if (prefabObject) {
+        console.log(prefabObject)
+        if (prefabObject !== false) {
+          prefabObject = JSON.parse(prefabObject)
           let tempCollection = JSON.parse(collectionRead())
-          tempCollection.prefabs.push(JSON.parse(prefabObject))
-          collectionUpdate(JSON.stringify(tempCollection, null, 2))
-          return true
+          if (tempCollection.prefabs.map(fab => fab.name == prefabObject.name).length == 0) {
+            tempCollection.prefabs.push(prefabObject)
+            collectionUpdate(JSON.stringify(tempCollection, null, 2))
+            return true
+          } else {
+            throw `Could not add prefab becsause "${prefabObject.name}" already exists`
+          }
         }
       } catch (err) {
         throw err

@@ -1,6 +1,12 @@
 {
-  "folders": [
-    "not-exist"
-  ],
-  "prefabs": []
+  "folders": [],
+  "prefabs": [
+    {
+      "name": "prefab",
+      "elements": [],
+      "folder": "",
+      "transition": "",
+      "quick": []
+    }
+  ]
 }
