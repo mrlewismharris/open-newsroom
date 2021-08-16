@@ -29,6 +29,8 @@ export default function ServerConsole(props) {
   const [typedMatchedCommandIndex, setTypedMatchedCommandIndex] = useState(0)
   const [dictionary, setDictionary] = useState([])
 
+  let clientVersion = "0.0.2"
+
   let localDictionary = [
     {command: "client_version", description: "Returns Open Newsroom version(s)", locale: "local",
       args: "None"},
@@ -147,7 +149,7 @@ export default function ServerConsole(props) {
             addToConsole(localDictionary.map(command => `${command.command} : ${command.description} (${command.locale}) - Args: ${command.args}`).join('\n'))
             break;
           case "client_version":
-            addToConsole("v0.0.1")
+            addToConsole(`Client Version: v${clientVersion}`)
             break;
           default:
             props.io("console", originalCommand, (response) => {

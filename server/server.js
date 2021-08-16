@@ -35,6 +35,8 @@ const dictionary = [
   {command: "prefab_update", description: "Update a specific prefab", locale: "remote", args: "1: Stringified prefab object in 'single quotes', same as prefab_add - prefab must already exist to update"},
   {command: "prefab_delete", description: "Delete a prefab from prefabs.json", locale: "remote", args: "1: Prefab name in 'single quotes'"},
   {command: "prefab_validate", description: "Validate prefab", locale: "remote", args: "1: Prefab object in 'single quotes'"},
+  //prefab element qCRUD - add elements to a prefab
+  {command: "element_validate", description: "Validate element", locale: "remote", args: "1: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
 
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
@@ -402,7 +404,26 @@ function prefabRemoveElement(prefabName, elementName) {
 }
 
 function prefabValidateElement(element) {
-  
+  element = JSON.parse(element)
+  let errors = ""
+  function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
+  if (!element.hasOwnProperty("name")) {addError("Prefab elements require a name field")}
+  if (!element.hasOwnProperty("css")) {element.css = {}}
+  if (!element.hasOwnProperty("transitions")) {element.transition = {}}
+  if (errors.length > 0) {
+    throw errors
+  }
+  if (element.name="") {addError("Prefab cannot have an empty name field")}
+  if (typeof element.css !== "object") {addError("Prefab css field must be an object")}
+  if (typeof element.transition !== "object") {addError("Prefab transition field must be an object")}
+  if (errors.length > 0) {
+    throw errors
+  }
+  if (errors.length == 0) {
+    return JSON.stringify(element)
+  } else {
+    return false
+  }
 }
 
 
@@ -597,16 +618,28 @@ io.on('connect', (socket) => {
       case "prefab_validate":
         if (data.indexOf("'") > -1) {
           try {
-            console.log(prefabValidate(data.split("'")[1]))
             if (prefabValidate(data.split("'")[1])) {
               fn("Prefab validated successfully")
             }
           } catch (err) {
-            console.log(err)
             fn(`Prefab not valid: ${JSON.stringify(err)}`)
           }
         } else {
           fn("prefab_validate requires a prefab object as an argument in 'single quotes'")
+        }
+        break;
+      case "element_validate":
+        if (data.indexOf("'") > -1) {
+          try {
+            let exec = prefabValidateElement(data.split("'")[1])
+            if (exec !== false) {
+              fn(exec)
+            }
+          } catch (err) {
+            fn(`Prefab not valid: ${JSON.stringify(err)}`)
+          }
+        } else {
+          fn("element_validate requires a prefab object as an argument in 'single quotes'")
         }
         break;
       case "server_version":
