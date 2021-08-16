@@ -380,6 +380,32 @@ function prefabValidate(prefab) {
   }
 }
 
+//qCRUD functions for prefab elements
+function prefabAddElement(prefabName, element) {
+
+}
+
+function prefabReadElement(prefabName, elementName) {
+
+}
+
+function prefabReadAllElements(prefabName) {
+
+}
+
+function prefabUpdateElement(prefabName, elementObject) {
+
+}
+
+function prefabRemoveElement(prefabName, elementName) {
+
+}
+
+function prefabValidateElement(element) {
+  
+}
+
+
 io.on('connect', (socket) => {
 
   //return the command dictionary

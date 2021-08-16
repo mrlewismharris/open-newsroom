@@ -250,7 +250,7 @@ export default function ServerConsole(props) {
               }
             }}
             onChange={(e) => {
-              setCommandHistoryIndex(-1)
+              setCommandHistoryIndex(commandHistoryList.length-1)
               //sniffCommand(e.target.value)
               sniffCommand(e)
             }}
