@@ -642,6 +642,22 @@ io.on('connect', (socket) => {
           fn("element_validate requires a prefab object as an argument in 'single quotes'")
         }
         break;
+      case "prefab_add_element":
+        //needs prefab name + element object
+        fn("Function not yet implemented")
+        break;
+      case "prefab_read_element":
+        //needs prefab name + element name
+        fn("Function not yet implemented")
+        break;
+      case "prefab_update_element":
+        //needs prefab name + element object
+        fn("Function not yet implemented")
+        break;
+      case "prefab_remove_element":
+        //needs prefab name + element name
+        fn("Function not yet implemented")
+        break;
       case "server_version":
         fn(`Server Version: v${version}`)
         break;
