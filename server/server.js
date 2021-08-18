@@ -39,6 +39,7 @@ const dictionary = [
   {command: "element_validate", description: "Validate element", locale: "remote", args: "1: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
   {command: "prefab_reset_elements", description: "Resets the element field of the prefab object to default (empty) state", locale: "remote", args: "1: Prefab name in 'single quotes'"},
   {command: "prefab_add_element", description: "Add elements to a prefab", locale: "remote", args: "1: Prefab name in 'single quotes' to add element to, 2: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
+  {command: "prefab_read_elements", description: "Return list of all elements in prefab, or single elements with 2nd arg", locale: "remote", args: "1: Prefab name in 'single quotes', (Optional) 2: Element object name in 'single quotes'"},
 
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
@@ -308,6 +309,7 @@ function prefabDelete(name) {
 }
 
 function prefabValidate(prefab) {
+  if (!prefab.includes("{")) {throw "Prefab Validate arg must be a prefab object"}
   let collection = collectionRead()
   let prefabObject = prefab
   if (typeof prefabObject !== "object") {prefabObject = JSON.parse(prefab)}
@@ -416,11 +418,22 @@ function prefabAddElement(prefabName, element) {
 }
 
 function prefabReadElement(prefabName, elementName) {
-
+  let prefab = prefabRead(prefabName)
+  if (prefab == false) {throw "Prefab name doesn't exist"}
+  if (prefab.elements.filter(el => el.name == elementName).length > 0) {
+    return prefab.elements.find(el => el.name == elementName)
+  } else {
+    return false
+  }
 }
 
 function prefabReadAllElements(prefabName) {
-
+  let prefab = prefabRead(prefabName)
+  if (prefab == false) {
+    throw "Prefab name doesn't exist"
+  } else {
+    return prefab.elements
+  }
 }
 
 function prefabUpdateElement(prefabName, elementObject) {
@@ -606,6 +619,7 @@ io.on('connect', (socket) => {
             fn(`New prefab ${JSON.parse(element).name} added to prefabs.json file`)
           }
         } catch(err) {
+          console.log(err)
           fn(err)
         }
         fn("Not yet implemented")
@@ -702,9 +716,36 @@ io.on('connect', (socket) => {
           fn("Prefab_add_element requires 2 args: prefab name in 'single quotes', and element object in 'single quotes'")
         }
         break;
-      case "prefab_read_element":
-        //needs prefab name + element name
-        fn("Function not yet implemented")
+      case "prefab_read_elements":
+        if (data.indexOf("'") > -1) {
+          if (data.split("'").length == 5) {
+            try {
+              let returned = prefabReadElement(data.split("'")[1], data.split("'")[3])
+              if (returned.length !== false) {
+                fn(JSON.stringify(returned))
+              } else {
+                fn(`Prefab "${data.split("'")[1]}" elements list is empty`)
+              }
+            } catch (err) {
+              console.log(err)
+              fn(`Prefab_read_elements error: ${JSON.stringify(err)}`)
+            }
+          } else if (data.split("'").length == 3) {
+            try {
+              let returned = prefabReadAllElements(data.split("'")[1])
+              if (returned.length > -1) {
+                fn(JSON.stringify(returned))
+              } else {
+                fn(`Prefab "${data.split("'")[1]}" elements list is empty`)
+              }
+            } catch (err) {
+              console.log(err)
+              fn(`Prefab_read_elements error: ${JSON.stringify(err)}`)
+            }
+          }
+        } else {
+          fn("Prefab_read_element requires 2 args: Prefab name and element name, both in 'single quotes'")
+        }
         break;
       case "prefab_update_element":
         //needs prefab name + element object
