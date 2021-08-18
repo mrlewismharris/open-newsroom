@@ -37,6 +37,8 @@ const dictionary = [
   {command: "prefab_validate", description: "Validate prefab", locale: "remote", args: "1: Prefab object in 'single quotes'"},
   //prefab element qCRUD - add elements to a prefab
   {command: "element_validate", description: "Validate element", locale: "remote", args: "1: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
+  {command: "prefab_reset_elements", description: "Resets the element field of the prefab object to default (empty) state", locale: "remote", args: "1: Prefab name in 'single quotes'"},
+  {command: "prefab_add_element", description: "Add elements to a prefab", locale: "remote", args: "1: Prefab name in 'single quotes' to add element to, 2: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
 
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
@@ -271,7 +273,6 @@ function prefabUpdate(prefab) {
     } else {
       try {
         let prefabObject = prefabValidate(prefab)
-        console.log(prefabObject)
         if (prefabObject) {
           prefabObject = JSON.parse(prefabObject)
           let tempCollection = JSON.parse(collection)
@@ -308,7 +309,8 @@ function prefabDelete(name) {
 
 function prefabValidate(prefab) {
   let collection = collectionRead()
-  let prefabObject = JSON.parse(prefab)
+  let prefabObject = prefab
+  if (typeof prefabObject !== "object") {prefabObject = JSON.parse(prefab)}
   let errors = ""
   function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
   if (!prefabObject.hasOwnProperty("name")) {addError("Prefab must have a name field")}
@@ -384,7 +386,33 @@ function prefabValidate(prefab) {
 
 //qCRUD functions for prefab elements
 function prefabAddElement(prefabName, element) {
-
+  let prefab = prefabRead(prefabName)
+  if (typeof element !== "object") {element = JSON.parse(element)}
+  //validate args
+  if (prefab == false) {throw "Prefab name doesn't exist"}
+  if (typeof element !== "object") {throw "Element object must be an object in 'single quotes'"}
+  try {
+    element = JSON.parse(prefabValidateElement(element))
+  } catch(err) {
+    throw err
+  }
+  if (prefab.elements.filter(el => el.name == element.name).length > 0) {
+    let highest = 0
+    let duplicatesList = prefab.elements.map(el => el.name).filter(el => el.startsWith(element.name) && el.includes("_")).map(el => el.substring(el.lastIndexOf("_") + 1, el.length))
+    if (duplicatesList.length > 0) {
+      console.log(duplicatesList)
+      highest = Math.max(...duplicatesList)
+    }
+    element.name += "_" + (highest + 1)
+  }
+  prefab.elements.push(element)
+  try {
+    if (prefabUpdate(JSON.stringify(prefab, null, 2))) {
+      return true
+    }
+  } catch(err) {
+    throw err
+  }
 }
 
 function prefabReadElement(prefabName, elementName) {
@@ -403,8 +431,24 @@ function prefabRemoveElement(prefabName, elementName) {
 
 }
 
+function prefabResetElements(prefabName) {
+  if (prefabName || prefabName !== "") {
+    let prefabExists = prefabRead(prefabName)
+    if (prefabExists !== false) {
+      let prefab = prefabExists
+      if (typeof prefab !== "object") {prefab = JSON.parse(prefab)}
+      prefab.elements = []
+      prefabUpdate(JSON.stringify(prefab))
+    } else {
+      throw `Prefab ${prefabName} doesn't exist`
+    }
+  } else {
+    throw "Arg prefab name wasn't sent"
+  }
+}
+
 function prefabValidateElement(element) {
-  element = JSON.parse(element)
+  if (typeof element !== "object") {element = JSON.parse(element)}
   let errors = ""
   function addError(err) {if (errors.length > 0) {errors += `, ${err.toLowerCase()}`} else {errors = err}}
   if (!element.hasOwnProperty("name")) {addError("Prefab elements require a name field")}
@@ -413,7 +457,7 @@ function prefabValidateElement(element) {
   if (errors.length > 0) {
     throw errors
   }
-  if (element.name="") {addError("Prefab cannot have an empty name field")}
+  if (element.name=="") {addError("Prefab cannot have an empty name field")}
   if (typeof element.css !== "object") {addError("Prefab css field must be an object")}
   if (typeof element.transition !== "object") {addError("Prefab transition field must be an object")}
   if (errors.length > 0) {
@@ -435,7 +479,6 @@ io.on('connect', (socket) => {
   })
 
   socket.on("console", (data, fn) => {
-    console.log("recieved a client console message", data)
     if (data.trim() == "") {
       fn("Client message was empty")
       return
@@ -563,7 +606,6 @@ io.on('connect', (socket) => {
             fn(`New prefab ${JSON.parse(element).name} added to prefabs.json file`)
           }
         } catch(err) {
-          console.log(err)
           fn(err)
         }
         fn("Not yet implemented")
@@ -643,8 +685,22 @@ io.on('connect', (socket) => {
         }
         break;
       case "prefab_add_element":
-        //needs prefab name + element object
-        fn("Function not yet implemented")
+        if (data.indexOf("'") > -1) {
+          if (data.split("'").length == 5) {
+            try {
+              if (prefabAddElement(data.split("'")[1], data.split("'")[3])) {
+                fn(`Element object successfully added to ${data.split("'")[1]}`)
+              }
+            } catch (err) {
+              console.log(err)
+              fn(`Prefab_add_element error: ${JSON.stringify(err)}`)
+            }
+          } else {
+            fn("Prefab_add_element requires 2 args: prefab name in 'single quotes', and element object in 'single quotes'")
+          }
+        } else {
+          fn("Prefab_add_element requires 2 args: prefab name in 'single quotes', and element object in 'single quotes'")
+        }
         break;
       case "prefab_read_element":
         //needs prefab name + element name
@@ -657,6 +713,20 @@ io.on('connect', (socket) => {
       case "prefab_remove_element":
         //needs prefab name + element name
         fn("Function not yet implemented")
+        break;
+      case "prefab_reset_elements":
+        if (data.indexOf("'") > -1) {
+          try {
+            if (prefabResetElements(data.split("'")[1]) !== false) {
+              fn(`Prefab ${data.split("'")[1]} reset successfully`)
+            }
+          } catch (err) {
+            console.log(err)
+            fn(JSON.stringify(err))
+          }
+        } else {
+          fn("Prefab_reset_elements requires prefab name in 'single quotes' as arg")
+        }
         break;
       case "server_version":
         fn(`Server Version: v${version}`)
