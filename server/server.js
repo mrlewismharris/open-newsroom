@@ -322,7 +322,9 @@ function prefabValidate(prefab) {
       //Do element validation here, loop thru elements and validate each in try/catch
       prefabObject.elements.forEach(el => {
         try {
-          //elementValidate(el)
+          if (prefabValidateElement(el)) {
+            el = prefabValidateElement(el)
+          }
         } catch (err) {
           addError(err)
         }
