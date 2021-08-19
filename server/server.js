@@ -329,6 +329,11 @@ function prefabValidate(prefab) {
       })
     }
   } else {prefabObject.elements = []}
+  if (prefabObject.hasOwnProperty("settings")) {
+    if (typeof prefabObject.settings !== "object") {
+      addError("Prefab settings aren't object")
+    }
+  } else {prefabObject.settings = {}}
   if (prefabObject.hasOwnProperty("folder")) {
     if (prefabObject.folder !== "") {
       if (!JSON.parse(collection).folders.includes(prefabObject.folder)) {
@@ -853,6 +858,24 @@ io.on('connect', (socket) => {
     }
     let command = data.query.function
     switch(command) {
+      case "prefabExists":
+        if (prefabRealAll())
+        break;
+      case "prefabReadAll":
+        try {
+          let output = prefabReadAll()
+          fn({"success":true,"data":{"prefabList":output}})
+        } catch(err) {
+          fn({"success":false,"data":{"error":JSON.stringify(err)}})
+        }
+        break;
+      case "prefabAdd":
+        try {
+          console.log()
+        } catch(err) {
+          fn({"success":false,"data":{"error":JSON.stringify(err)}})
+        }
+        break;
       default:
         fn({"success":false,"data":"Function not found"})
         break;

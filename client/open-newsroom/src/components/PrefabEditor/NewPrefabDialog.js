@@ -69,8 +69,10 @@ function handleNewPrefab() {
   if (!nameError && !widthError && !heightError) {
     //Check unique name here
     props.io("exec", {query: {"function":"prefabReadAll"}}, (response) => {
-      console.log(response)
       let uniqueName = true;
+      if (response.data.prefabList.includes(inputPrefabName)) {
+        uniqueName = false
+      } 
       if (uniqueName) {
         props.newPrefab(inputPrefabName, parseInt(inputWidth), parseInt(inputHeight))
         handleClose()
