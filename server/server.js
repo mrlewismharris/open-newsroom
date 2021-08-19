@@ -436,8 +436,29 @@ function prefabReadAllElements(prefabName) {
   }
 }
 
-function prefabUpdateElement(prefabName, elementObject) {
-
+function prefabUpdateElement(prefabName, element) {
+  let prefab = prefabRead(prefabName)
+  if (prefab == false) {
+    throw "Prefab name doesn't exist"
+  } else {
+    if (!element.includes("{") || !element.includes("}")) {throw "Element object formatted incorrectly"}
+    if (typeof element !== "object") {element = JSON.parse(element)}
+    if (!prefab.elements.find(el => el.name == element.name)) {throw "Element doesn't exist - use prefabAddElement instead"}
+    try {
+      element = JSON.parse(prefabValidateElement(element))
+    } catch(err) {
+      throw err
+    }
+    prefab.elements = prefab.elements.filter(el => el.name !== element.name)
+    prefab.elements.push(element)
+    try {
+      if (prefabUpdate(JSON.stringify(prefab))) {
+        return true
+      }
+    } catch (err) {
+      throw err
+    }
+  }
 }
 
 function prefabRemoveElement(prefabName, elementName) {
@@ -748,8 +769,20 @@ io.on('connect', (socket) => {
         }
         break;
       case "prefab_update_element":
-        //needs prefab name + element object
-        fn("Function not yet implemented")
+        if (data.split("'").length == 5) {
+          let prefabName = data.split("'")[1]
+          let elementObject = data.split("'")[3]
+          try {
+            if (prefabUpdateElement(prefabName, elementObject)) {
+              fn(`Prefab "${prefabName}" element "${JSON.parse(elementObject).name}" was updated sucessfully`)
+            }
+          } catch (err) {
+            console.log(err)
+            fn(`Prefab_read_elements error: ${JSON.stringify(err)}`)
+          }
+        } else {
+          fn("Prefab_update_element requires 2 args: Prefab name and element object, both in 'single quotes'")
+        }
         break;
       case "prefab_remove_element":
         //needs prefab name + element name
