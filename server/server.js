@@ -40,7 +40,8 @@ const dictionary = [
   {command: "prefab_reset_elements", description: "Resets the element field of the prefab object to default (empty) state", locale: "remote", args: "1: Prefab name in 'single quotes'"},
   {command: "prefab_add_element", description: "Add elements to a prefab", locale: "remote", args: "1: Prefab name in 'single quotes' to add element to, 2: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
   {command: "prefab_read_elements", description: "Return list of all elements in prefab, or single elements with 2nd arg", locale: "remote", args: "1: Prefab name in 'single quotes', (Optional) 2: Element object name in 'single quotes'"},
-
+  {command: "prefab_update_element", description: "Update an element in a prefab", locale: "remote", args: "1: Prefab name in 'single quotes', 2: Element object in 'single quotes'"},
+  {command: "prefab_remove_element", description: "Remove element from prefab", locale: "remote", args: "1: Prefab name in 'single quotes', 2: Element name in 'single quotes'"},
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote", args: "None"},
@@ -462,7 +463,19 @@ function prefabUpdateElement(prefabName, element) {
 }
 
 function prefabRemoveElement(prefabName, elementName) {
-
+  let prefab = prefabRead(prefabName)
+  if (prefab == false) {
+    throw "Prefab name doesn't exist"
+  }
+  if (!prefab.elements.find(el => el.name == elementName)) {throw `Element doesn't exist in ${prefabName}`}
+  prefab.elements = prefab.elements.filter(el => el.name !== elementName)
+  try {
+    if (prefabUpdate(JSON.stringify(prefab))) {
+      return true
+    }
+  } catch (err) {
+    throw err
+  }
 }
 
 function prefabResetElements(prefabName) {
@@ -778,15 +791,28 @@ io.on('connect', (socket) => {
             }
           } catch (err) {
             console.log(err)
-            fn(`Prefab_read_elements error: ${JSON.stringify(err)}`)
+            fn(`Prefab_read_element error: ${JSON.stringify(err)}`)
           }
         } else {
           fn("Prefab_update_element requires 2 args: Prefab name and element object, both in 'single quotes'")
         }
         break;
       case "prefab_remove_element":
-        //needs prefab name + element name
-        fn("Function not yet implemented")
+        if (data.split("'").length == 5) {
+          let prefabName = data.split("'")[1]
+          let elementName = data.split("'")[3]
+          try {
+            if (prefabRemoveElement(prefabName, elementName)) {
+              fn(`Element "${elementName}" was successfully removed from "${prefabName}"`)
+            }
+          } catch (err) {
+            console.log(err)
+            fn(`Prefab_remove_element error: ${JSON.stringify(err)}`)
+          }
+        } else {
+          fn("Prefab_remove_element requires 2 args: Prefab name and element name, both in 'single quotes'")
+        }
+        break;
         break;
       case "prefab_reset_elements":
         if (data.indexOf("'") > -1) {
