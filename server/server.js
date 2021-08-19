@@ -13,7 +13,7 @@ let collectionName = "";
 let ini;
 
 //constants and defaults
-const version = "0.0.2";
+const version = "0.1.1";
 const defaultPrefabJson = {"folders":[],"prefabs":[]}
 const validPrefabTypes = ["text", "box", "image"]
 
