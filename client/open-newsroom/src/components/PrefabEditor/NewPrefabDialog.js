@@ -67,15 +67,18 @@ function handleNewPrefab() {
   }
 
   if (!nameError && !widthError && !heightError) {
-    let uniqueName = true;
     //Check unique name here
-    if (uniqueName) {
-      props.newPrefab(inputPrefabName, parseInt(inputWidth), parseInt(inputHeight))
-      handleClose()
-    } else {
-      setPrefabNameError("Prefab name already exists")
-      setInputPrefabNameError(true)
-    }
+    props.io("exec", {query: {"function":"prefabReadAll"}}, (response) => {
+      console.log(response)
+      let uniqueName = true;
+      if (uniqueName) {
+        props.newPrefab(inputPrefabName, parseInt(inputWidth), parseInt(inputHeight))
+        handleClose()
+      } else {
+        setPrefabNameError("Prefab name already exists")
+        setInputPrefabNameError(true)
+      }
+    })
   }
 
 }

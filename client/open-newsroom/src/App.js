@@ -75,7 +75,7 @@ function App() {
           ? { top: DialogMenuState.y, left: DialogMenuState.x } : undefined
         }
       />
-      <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={{width: 1920, height: 1080}} />
+      <PrefabEditor contextHandler={contextHandle} open={PrefabEditorOpen} onClose={() => setPrefabEditorOpen(false)} canvasInfo={{width: 1920, height: 1080}} io={ioHandle}/>
       
       <ServerConsole open={ServerConsoleOpen} onClose={() => setServerConsoleOpen(false)} io={ioHandle}/>
 

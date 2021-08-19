@@ -846,6 +846,19 @@ io.on('connect', (socket) => {
     }
   })
 
+  socket.on('exec', (data, fn) => {
+    if (typeof data.query.function == 'undefined' || data.query.function == "") {
+      fn({"success":false,"data":"Function was undefined or empty"})
+      return false
+    }
+    let command = data.query.function
+    switch(command) {
+      default:
+        fn({"success":false,"data":"Function not found"})
+        break;
+    }
+  })
+
   socket.emit('iniFile', ini)
 
   if (serverFirstRun) {

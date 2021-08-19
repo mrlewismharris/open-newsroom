@@ -182,7 +182,7 @@ export default function PrefabEditor(props) {
           </Toolbar>
         </AppBar>
 
-        <NewPrefabDialog open={newPrefabDialog} placeholderHeight={props.canvasInfo.height} placeholderWidth={props.canvasInfo.width} onClose={() => setNewPrefabDialog(false)} setCanvasInfo={setEditorCanvasInfo} newPrefab={createNewPrefab} />
+        <NewPrefabDialog open={newPrefabDialog} placeholderHeight={props.canvasInfo.height} placeholderWidth={props.canvasInfo.width} onClose={() => setNewPrefabDialog(false)} setCanvasInfo={setEditorCanvasInfo} newPrefab={createNewPrefab} io={props.io}/>
 
         {/*  Dialog elements go here  */}
         <Canvas
