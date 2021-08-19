@@ -11,11 +11,12 @@ let sceneCollection = [];
 let serverFirstRun = true;
 let collectionName = "";
 let ini;
+let customPlaceholderText = "Placeholder"
 
 //constants and defaults
-const version = "0.1.1";
+const version = "0.0.3";
 const defaultPrefabJson = {"folders":[],"prefabs":[]}
-const validPrefabTypes = ["text", "box", "image"]
+const validPrefabTypes = ["text", "box", "media"]
 
 const dictionary = [
   //collection CRUD (for prefab.json)
@@ -36,7 +37,7 @@ const dictionary = [
   {command: "prefab_delete", description: "Delete a prefab from prefabs.json", locale: "remote", args: "1: Prefab name in 'single quotes'"},
   {command: "prefab_validate", description: "Validate prefab", locale: "remote", args: "1: Prefab object in 'single quotes'"},
   //prefab element qCRUD - add elements to a prefab
-  {command: "element_validate", description: "Validate element", locale: "remote", args: "1: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
+  {command: "element_validate", description: "Validate element", locale: "remote", args: "1: Element object in 'single quotes' requires a name and type, optionally css and transitions will be added if blank, if type is text, placeholder text is added"},
   {command: "prefab_reset_elements", description: "Resets the element field of the prefab object to default (empty) state", locale: "remote", args: "1: Prefab name in 'single quotes'"},
   {command: "prefab_add_element", description: "Add elements to a prefab", locale: "remote", args: "1: Prefab name in 'single quotes' to add element to, 2: Element object in 'single quotes' (requires a name, optionally css and transitions will be added if blank)"},
   {command: "prefab_read_elements", description: "Return list of all elements in prefab, or single elements with 2nd arg", locale: "remote", args: "1: Prefab name in 'single quotes', (Optional) 2: Element object name in 'single quotes'"},
@@ -508,6 +509,14 @@ function prefabValidateElement(element) {
   if (!element.hasOwnProperty("name")) {addError("Prefab elements require a name field")}
   if (!element.hasOwnProperty("css")) {element.css = {}}
   if (!element.hasOwnProperty("transitions")) {element.transition = {}}
+  if (!element.hasOwnProperty("type")) {
+    element.type = "box"
+  } else {
+    if (!validPrefabTypes.includes(element.type)) {
+      addError(`Prefab type must be one of: ${validPrefabTypes.join(", ")}`)
+    }
+  }
+  if (!element.hasOwnProperty("text")) {element.text = customPlaceholderText}
   if (errors.length > 0) {
     throw errors
   }
