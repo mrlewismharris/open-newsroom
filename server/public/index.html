@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>Hello</title>
-      <script src = "/socket.io/socket.io.js"></script>
+   <head> 
+      <meta charset="UTF-8">
+      <title>Open Newsroom OBS Display</title>
+      <script src = "io/socket.io.js"></script>
       <style>
         body {margin:0;overflow:hidden}
         #mainContainer {width:1920px;height:1080px;}
         .onscreenElement {position:absolute;}
+        .noConnect {font-size:32px;font-weight:bold;background-color:#000;color:#fff;margin:0;}
       </style>
-      <script>const socket = io();</script>
    </head>
    <body>
-    <div id="mainContainer"></div>
+    <div id="mainContainer"><p class="noConnect">No Connection</p></div>
     <script>
+      const socket = io();
+      //on connect msg clear "no connection" from mainContainer
+      
+      socket.emit("clientTestConnection", (data) => {
+        socket.on("obsConnect", () => {
+          document.getElementById("mainContainer").innerHTML = ""
+        })
+      })
 
       socket.on("broadcastSceneCollection", (data) => {
         let screen = document.getElementById("mainContainer");

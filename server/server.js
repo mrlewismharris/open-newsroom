@@ -1,10 +1,14 @@
-const app = require('express')();
-const io = require('socket.io')(3001, {
+//ports
+const ioPort  = 3001
+const displayPort = 3002
+
+const io = require('socket.io')(ioPort, {
   cors: {
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST'],
   },
 });
+const { response } = require('express');
 const fs = require('fs');
 
 let sceneCollection = [];
@@ -928,6 +932,10 @@ io.on('connect', (socket) => {
 
   io.emit('broadcastSceneCollection', sceneCollection);
 
+  io.on('clientTestConnection', () => {
+    io.emit('obsConnect')
+  })
+
   socket.on('addScene', (data) => {
     for (i=0;i<sceneCollection.length;i++) {
       console.log(`Checking if ${i} of sceneCollection is ${data.name}`)
@@ -946,3 +954,39 @@ io.on('connect', (socket) => {
   })
 
 });
+
+//the OBS connection serve
+let http = require('http')
+
+//obs-display global vars
+
+
+let fsDir = fs.readdirSync('fs')
+if (!fsDir.includes("display.json")) {
+  fs.writeFileSync('fs/display.json', JSON.stringify(defaultPrefabJson, null, 2))
+}
+
+http.createServer((req, res) => {
+  let path = "public" + req.url
+  if (path == "public/") {path = "public/index.html"}
+  let extension = path.split(".")[path.split(".").length-1]
+  let contentType = "text/html"
+  if (extension == "js") {contentType = "text/javascript"}
+  if (extension == "css") {contentType = "text/css"}
+  if (!path.includes("&transport=polling")) {
+    fs.readFile(path, "utf-8", (err, content) => {
+      if (err) {
+        if (err.code == 'ENOENT') {
+          res.writeHead(404, {'Content-Type': contentType})
+          res.end("404 - File not found" + err.code, "utf-8")
+        } else {
+          res.writeHead(500)
+          res.end("500 - Unknown Error")
+        }
+      } else {
+        res.writeHead(200, {'Content-Type': contentType})
+        res.end(content, 'utf-8')
+      }
+    })
+  }
+}).listen(displayPort)
