@@ -4,7 +4,7 @@ const displayPort = 3002
 
 const io = require('socket.io')(ioPort, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 });
@@ -905,61 +905,15 @@ io.on('connect', (socket) => {
     })
   }
 
-  socket.on("clientSendScene", (data) => {
-    io.emit("obsDisplay", data)
-  })
-
-  socket.on('chooseCollection', (name) => {
-    collectionName = name
-    reloadCollection()
-  })
-
-  function reloadCollection() {
-    console.log(`Attempting to read "fs/collections/${collectionName}"`)
-    if (fs.existsSync(`fs/collections/${collectionName}`)) {
-      fs.readFile(`fs/collections/${collectionName}`, "utf8", (err, data) => {
-        if (err) {console.log(err)}
-        sceneCollection = JSON.parse(data)
-        console.log("Read successful! Scene collection set")
-      })
-    } else {
-      fs.writeFile(`fs/collections/${collectionName}`, "", (err) => {
-        if (err) throw err;
-        console.log('FS: Save File Updated')
-      })
-    }
-  }
-
-  io.emit('broadcastSceneCollection', sceneCollection);
-
-  io.on('clientTestConnection', () => {
-    io.emit('obsConnect')
-  })
-
-  socket.on('addScene', (data) => {
-    for (i=0;i<sceneCollection.length;i++) {
-      console.log(`Checking if ${i} of sceneCollection is ${data.name}`)
-      if (data.name == sceneCollection[i].name) {
-        console.log(`Duplicate found! ${i} of sceneCollection was "${sceneCollection[i].name}"`)
-        sceneCollection.splice(i, 1)
-      }
-    }
-    sceneCollection.push(data)
-    console.log(sceneCollection)
-    io.emit('update-scene', data)
-    fs.writeFile(`fs/collections/${collectionName}`, JSON.stringify(data), (err) => {
-      if (err) throw err;
-      console.log('FS: Save File Updated')
-    })
-  })
+  //the initial connection response for obs display
+  io.emit("obsConnect")
+  
+  io.emit('currentScene', sceneCollection);
 
 });
 
-//the OBS connection serve
+//the OBS-Dispaly connection server
 let http = require('http')
-
-//obs-display global vars
-
 
 let fsDir = fs.readdirSync('fs')
 if (!fsDir.includes("display.json")) {

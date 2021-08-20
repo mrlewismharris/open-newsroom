@@ -14,13 +14,10 @@
    <body>
     <div id="mainContainer"><p class="noConnect">No Connection</p></div>
     <script>
-      const socket = io();
-      //on connect msg clear "no connection" from mainContainer
+      const socket = io("http://localhost:3001");
       
-      socket.emit("clientTestConnection", (data) => {
-        socket.on("obsConnect", () => {
-          document.getElementById("mainContainer").innerHTML = ""
-        })
+      socket.on("obsConnect", () => {
+        document.getElementById("mainContainer").innerHTML = ""
       })
 
       socket.on("broadcastSceneCollection", (data) => {
