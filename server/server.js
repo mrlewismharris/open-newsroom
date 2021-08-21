@@ -48,6 +48,15 @@ const dictionary = [
   {command: "prefab_read_elements", description: "Return list of all elements in prefab, or single elements with 2nd arg", locale: "remote", args: "1: Prefab name in 'single quotes', (Optional) 2: Element object name in 'single quotes'"},
   {command: "prefab_update_element", description: "Update an element in a prefab", locale: "remote", args: "1: Prefab name in 'single quotes', 2: Element object in 'single quotes'"},
   {command: "prefab_remove_element", description: "Remove element from prefab", locale: "remote", args: "1: Prefab name in 'single quotes', 2: Element name in 'single quotes'"},
+
+  //display CRUD (incomplete)
+  {command: "display_update", description: "Update the live display with object", locale: "remote", args: "1: Prefab object in 'single quotes'"},
+  {command: "display_prefab_update", description: "Update the live display with saved prefab name", locale: "remote", args: "1: Prefab name in 'single quotes'"},
+  {command: "display_empty", description: "Empties the live display", locale: "remote", args: "None"},
+
+
+
+
   {command: "server_version", description: "Returns Open Newsroom server version", locale: "remote", args: "None"},
   {command: "server_test", description: "Test connection to the server", locale: "remote", args: "None"},
   {command: "server_help", description: "Display all the available commands from the server dictionary", locale: "remote", args: "None"},
@@ -551,10 +560,12 @@ function displayRead() {
 function displayUpdate(prefab) {
   if (typeof prefab !== "object") {prefab = JSON.parse(prefab)}
   try {
-    prefab = prefabValidate(prefab)
-    if (prefab == false) return
+    prefab = JSON.parse(prefabValidate(JSON.stringify(prefab)))
+    console.log(typeof prefab)
+    if (prefab == false) throw "Prefab was not valid"
     prefab.empty = false
     fs.writeFileSync('fs/display.json', JSON.stringify(prefab, null, 2))
+    return true
   } catch (err) {
     throw err
   }
@@ -860,7 +871,6 @@ io.on('connect', (socket) => {
           fn("Prefab_remove_element requires 2 args: Prefab name and element name, both in 'single quotes'")
         }
         break;
-        break;
       case "prefab_reset_elements":
         if (data.indexOf("'") > -1) {
           try {
@@ -874,6 +884,43 @@ io.on('connect', (socket) => {
         } else {
           fn("Prefab_reset_elements requires prefab name in 'single quotes' as arg")
         }
+        break;
+      case "display_update":
+        if (data.indexOf("'") > -1) {
+          try {
+            if (displayUpdate(JSON.stringify(data.split("'")[1]) !== false)) {
+              fn('Display updated successfully')
+            }
+          } catch (err) {
+            console.log(err)
+            fn(JSON.stringify(err))
+          }
+        } else {
+          fn("display_update requires prefab object in 'single quotes' as arg")
+        }
+        break;
+      case "display_prefab_update":
+        if (data.indexOf("'") > -1) {
+          try {
+            let prefabList = prefabReadAll()
+            if (prefabList.includes(data.split("'")[1])) {
+              let prefab = prefabRead(data.split("'")[1])
+              if (displayUpdate(JSON.stringify(prefab))) {
+                fn(`Display updated to ${data.split("'")[1]}`)
+              }
+            } else {
+              fn("Prefab doesn't exist")
+            }
+          } catch (err) {
+            console.log(err)
+            fn(JSON.stringify(err))
+          }
+        } else {
+          fn("display_prefab_update requires prefab name in 'single quotes' as arg")
+        }
+        break;
+      case "display_empty":
+          displayEmpty()
         break;
       case "server_version":
         fn(`Server Version: v${version}`)
