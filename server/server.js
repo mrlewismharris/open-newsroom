@@ -20,6 +20,7 @@ let customPlaceholderText = "Placeholder"
 //constants and defaults
 const version = "0.0.3";
 const defaultPrefabJson = {"folders":[],"prefabs":[]}
+const defaultDisplayJson = {"empty": true}
 const validPrefabTypes = ["text", "box", "media"]
 
 const dictionary = [
@@ -537,6 +538,32 @@ function prefabValidateElement(element) {
   }
 }
 
+//RUD for display (display.json file)
+function displayRead() {
+  let fsDir = fs.readdirSync('fs')
+  if (fsDir.includes("display.json")) {
+    return fs.readFileSync('fs/display.json', {encoding:'utf8'})
+  } else {
+    return false
+  }
+}
+
+function displayUpdate(prefab) {
+  if (typeof prefab !== "object") {prefab = JSON.parse(prefab)}
+  try {
+    prefab = prefabValidate(prefab)
+    if (prefab == false) return
+    prefab.empty = false
+    fs.writeFileSync('fs/display.json', JSON.stringify(prefab, null, 2))
+  } catch (err) {
+    throw err
+  }
+}
+
+function displayEmpty() {
+  let empty = {"empty": true}
+  fs.writeFileSync('fs/display.json', JSON.stringify(empty, null, 2))
+}
 
 io.on('connect', (socket) => {
 
@@ -905,11 +932,20 @@ io.on('connect', (socket) => {
     })
   }
 
+  //obs display functions
+
+
   //the initial connection response for obs display
   io.emit("obsConnect")
-  
-  io.emit('currentScene', sceneCollection);
 
+  socket.on("retrieveDisplay", (fn) => {
+    let current = displayRead()
+    if (current !== false) {
+      fn(current)
+    } else {
+      fn(false)
+    }
+  })
 });
 
 //the OBS-Dispaly connection server
@@ -917,7 +953,7 @@ let http = require('http')
 
 let fsDir = fs.readdirSync('fs')
 if (!fsDir.includes("display.json")) {
-  fs.writeFileSync('fs/display.json', JSON.stringify(defaultPrefabJson, null, 2))
+  fs.writeFileSync('fs/display.json', JSON.stringify(defaultDisplayJson, null, 2))
 }
 
 http.createServer((req, res) => {

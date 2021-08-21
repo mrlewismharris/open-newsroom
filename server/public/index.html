@@ -15,31 +15,21 @@
     <div id="mainContainer"><p class="noConnect">No Connection</p></div>
     <script>
       const socket = io("http://localhost:3001");
-      
+
       socket.on("obsConnect", () => {
         document.getElementById("mainContainer").innerHTML = ""
-      })
-
-      socket.on("broadcastSceneCollection", (data) => {
-        let screen = document.getElementById("mainContainer");
-        //screen.innerHTML = "";
-        console.log(data);
-        //screen.append(data);
-      })
-
-      socket.on("obsDisplay", (data) => {
-        let main = document.getElementById("mainContainer")
-        main.innerHTML = ""
-        if (data.length == 0) return
-        data.forEach(el => {
-          let element = document.createElement(el.type)
-          element.className = "onscreenElement"
-          element.style = el.params
-          element.innerText = el.content
-          console.log(element)
-          main.appendChild(element)
+        socket.emit("retrieveDisplay", (data) => {
+          updateDisplay(data)
         })
       })
+
+      function updateDisplay(data) {
+        if (data == false) {
+          console.log("Error updating display")
+          return
+        }
+        console.log(data)
+      }
 
     </script>
    </body>
