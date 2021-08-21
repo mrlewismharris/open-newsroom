@@ -1,4 +1,13 @@
 {
   "folders": [],
-  "prefabs": []
+  "prefabs": [
+    {
+      "name": "prefab1",
+      "elements": [],
+      "settings": {},
+      "folder": "",
+      "transition": "",
+      "quick": []
+    }
+  ]
 }

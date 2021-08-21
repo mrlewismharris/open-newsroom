@@ -23,6 +23,10 @@
         })
       })
 
+      socket.on("displayUpdated", data => {
+        updateDisplay(data)
+      })
+
       function updateDisplay(data) {
         if (data == false) {
           console.log("Error updating display")

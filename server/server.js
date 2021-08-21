@@ -565,6 +565,7 @@ function displayUpdate(prefab) {
     if (prefab == false) throw "Prefab was not valid"
     prefab.empty = false
     fs.writeFileSync('fs/display.json', JSON.stringify(prefab, null, 2))
+    displaySend()
     return true
   } catch (err) {
     throw err
@@ -574,6 +575,8 @@ function displayUpdate(prefab) {
 function displayEmpty() {
   let empty = {"empty": true}
   fs.writeFileSync('fs/display.json', JSON.stringify(empty, null, 2))
+  displaySend()
+  return true
 }
 
 io.on('connect', (socket) => {
@@ -981,7 +984,6 @@ io.on('connect', (socket) => {
 
   //obs display functions
 
-
   //the initial connection response for obs display
   io.emit("obsConnect")
 
@@ -993,6 +995,7 @@ io.on('connect', (socket) => {
       fn(false)
     }
   })
+
 });
 
 //the OBS-Dispaly connection server
@@ -1001,6 +1004,10 @@ let http = require('http')
 let fsDir = fs.readdirSync('fs')
 if (!fsDir.includes("display.json")) {
   fs.writeFileSync('fs/display.json', JSON.stringify(defaultDisplayJson, null, 2))
+}
+
+function displaySend() {
+  io.emit("displayUpdated", displayRead())
 }
 
 http.createServer((req, res) => {
