@@ -9,6 +9,8 @@
         #mainContainer {width:1920px;height:1080px;}
         .onscreenElement {position:absolute;}
         .noConnect {font-size:32px;font-weight:bold;background-color:#000;color:#fff;margin:0;}
+
+        .displayBox {position:absolute;}
       </style>
    </head>
    <body>
@@ -16,8 +18,11 @@
     <script>
       const socket = io("http://localhost:3001");
 
+      let currentDisplay = {}
+      let canvas = document.getElementById("mainContainer")
+
       socket.on("obsConnect", () => {
-        document.getElementById("mainContainer").innerHTML = ""
+        canvas.innerHTML = ""
         socket.emit("retrieveDisplay", (data) => {
           updateDisplay(data)
         })
@@ -28,11 +33,34 @@
       })
 
       function updateDisplay(data) {
+        if (typeof data !== "object") {data = JSON.parse(data)}
         if (data == false) {
-          console.log("Error updating display")
+          console.log("Error updating display, server data was false")
           return
         }
-        console.log(data)
+        currentDisplay = data
+        canvas.innerHTML = ""
+        data.elements.forEach(el => {
+          let element
+          switch (el.type) {
+            case "box":
+              element = document.createElement("div")
+              element.className = "displayBox"
+              break
+            case "text":
+              element = document.createElement("p")
+              element.innerText = el.text
+              break
+            case "media":
+              //element = document.createElement("div") ?? ...
+            break
+            default: element = document.createElement("div"); break;
+          }
+          element.id = el.name
+          element.style = Object.entries(el.css).map(([k, v]) => `${k}:${v}`).join(';')
+          canvas.appendChild(element)
+          console.log(element)
+        })
       }
 
     </script>

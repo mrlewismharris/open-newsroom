@@ -3,7 +3,21 @@
   "prefabs": [
     {
       "name": "prefab1",
-      "elements": [],
+      "elements": [
+        {
+          "name": "simple_box",
+          "css": {
+            "background-color": "#999",
+            "top": "60px",
+            "left": "120px",
+            "width": "200px",
+            "height": "200px"
+          },
+          "transition": {},
+          "type": "box",
+          "text": "Placeholder"
+        }
+      ],
       "settings": {},
       "folder": "",
       "transition": "",
