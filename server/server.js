@@ -240,6 +240,7 @@ function prefabAdd(prefab) {
       throw "Prefabs.json is not formatted corrently (needs 'prefabs' property)"
     } else {
       try {
+        if (typeof prefab == "object") {prefab = JSON.stringify(prefab)}
         let prefabObject = prefabValidate(prefab)
         console.log(prefabObject)
         if (prefabObject !== false) {
@@ -290,6 +291,7 @@ function prefabUpdate(prefab) {
       throw "Prefabs.json is not formatted corrently (needs 'prefabs' property)"
     } else {
       try {
+        if (typeof prefab == "object") {prefab = JSON.stringify(prefab)}
         let prefabObject = prefabValidate(prefab)
         if (prefabObject) {
           prefabObject = JSON.parse(prefabObject)
@@ -959,14 +961,28 @@ io.on('connect', (socket) => {
           let output = prefabReadAll()
           fn({"success":true,"data":{"prefabList":output}})
         } catch(err) {
-          fn({"success":false,"data":{"error":JSON.stringify(err)}})
+          if (err == "Prefab list empty") {
+            fn({"success":true,"data":{"prefabList":[]}})
+          } else {
+            fn({"success":false,"data":{"error":err}})
+          }
         }
         break;
       case "prefabAdd":
         try {
-          console.log()
+          console.log(data.query.prefabName)
+          if (prefabAdd({
+            "name": data.query.prefabName,
+            "settings": {
+              "width": data.query.settings.width,
+              "height": data.query.settings.height
+            }
+          })) {
+            fn({"success":true})
+          }
         } catch(err) {
-          fn({"success":false,"data":{"error":JSON.stringify(err)}})
+          console.log(err)
+          fn({"success":false,"data":{"error":err}})
         }
         break;
       default:

@@ -69,15 +69,38 @@ function handleNewPrefab() {
   if (!nameError && !widthError && !heightError) {
     //Check unique name here
     props.io("exec", {query: {"function":"prefabReadAll"}}, (response) => {
-      let uniqueName = true;
-      if (response.data.prefabList.includes(inputPrefabName)) {
-        uniqueName = false
-      } 
-      if (uniqueName) {
-        props.newPrefab(inputPrefabName, parseInt(inputWidth), parseInt(inputHeight))
-        handleClose()
+      if (response.success) {
+        let uniqueName = true;
+        if (response.data.prefabList.includes(inputPrefabName)) {
+          uniqueName = false
+        } 
+        if (uniqueName) {
+          props.io("exec", {
+            query: {
+              "function": "prefabAdd",
+              "prefabName": inputPrefabName,
+              "settings": {
+                "width": inputWidth,
+                "height": inputHeight
+              }
+            }
+          }, (response) => {
+            if (response.success) {
+              props.newPrefab(inputPrefabName, parseInt(inputWidth), parseInt(inputHeight))
+              handleClose()
+            } else {
+              setPrefabNameError("Server error while creating prefab")
+              console.log(response.data.error)
+              setInputPrefabNameError(true)
+            }
+          })
+        } else {
+          setPrefabNameError("Prefab name already exists")
+          setInputPrefabNameError(true)
+        }
       } else {
-        setPrefabNameError("Prefab name already exists")
+        setPrefabNameError("Server error while creating prefab")
+        console.log(response)
         setInputPrefabNameError(true)
       }
     })
