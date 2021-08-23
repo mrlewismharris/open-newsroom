@@ -23,3 +23,5 @@
 .canvasContainer { overflow: hidden!important; padding: 64px 0 0 47px!important; }
 
 .canvasInnerContainer { box-sizing: border-box; overflow: hidden!important}
+
+.labelTopMargin { margin-top: 15px!important; }

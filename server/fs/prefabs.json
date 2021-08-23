@@ -1,27 +1,4 @@
 {
   "folders": [],
-  "prefabs": [
-    {
-      "name": "awdasd",
-      "settings": {
-        "width": 1920,
-        "height": 1080
-      },
-      "elements": [],
-      "folder": "",
-      "transition": "",
-      "quick": []
-    },
-    {
-      "name": "awdad",
-      "settings": {
-        "width": 1920,
-        "height": 1080
-      },
-      "elements": [],
-      "folder": "",
-      "transition": "",
-      "quick": []
-    }
-  ]
+  "prefabs": []
 }

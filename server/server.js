@@ -968,16 +968,38 @@ io.on('connect', (socket) => {
           }
         }
         break;
+      case "folderReadAll":
+        try {
+          let output = folderReadAll()
+          fn({"success":true,"data":{"folderList":output}})
+        } catch(err) {
+          if (err == "Folder list empty") {
+            fn({"success":true,"data":{"folderList":[]}})
+          } else {
+            fn({"success":false,"data":{"error":err}})
+          }
+        }
+        break;
       case "prefabAdd":
         try {
-          console.log(data.query.prefabName)
           if (prefabAdd({
             "name": data.query.prefabName,
+            "folder": data.query.folder,
             "settings": {
               "width": data.query.settings.width,
               "height": data.query.settings.height
             }
           })) {
+            fn({"success":true})
+          }
+        } catch(err) {
+          console.log(err)
+          fn({"success":false,"data":{"error":err}})
+        }
+        break;
+      case "folderAdd":
+        try {
+          if (folderAdd(data.query.folderName)) {
             fn({"success":true})
           }
         } catch(err) {
