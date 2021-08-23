@@ -24,4 +24,8 @@
 
 .canvasInnerContainer { box-sizing: border-box; overflow: hidden!important}
 
-.labelTopMargin { margin-top: 15px!important; }
+.labelTopMargin { margin-top: 25px!important; box-sizing: border-box!important; }
+
+.newFolderTextfield { height: 60px!important; width: 170px; }
+
+.newFolderAddButton { margin-top: 5px!important }

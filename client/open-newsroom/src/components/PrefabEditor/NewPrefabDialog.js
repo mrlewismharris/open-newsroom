@@ -80,6 +80,7 @@ export default function NewPrefabDialog(props) {
               query: {
                 "function": "prefabAdd",
                 "prefabName": inputPrefabName,
+                "folder": selectedFolder,
                 "settings": {
                   "width": inputWidth,
                   "height": inputHeight
@@ -137,9 +138,14 @@ export default function NewPrefabDialog(props) {
 
   useEffect(() => {
     setTimeout(handleUpdateFolderList, 2000)
-  }, [])
+  })
 
   function handleCreateNewFolder() {
+    if (newFolderName.trim() === "") {
+      setInputNewFolderError("Folder name empty")
+      setNewFolderError(true)
+      return
+    }
     props.io("exec", {query: {"function":"folderAdd", "folderName": newFolderName}}, (response) => {
       if (response.success) {
         handleUpdateFolderList()
@@ -223,9 +229,11 @@ export default function NewPrefabDialog(props) {
             <Grid container spacing={2}>
               <Grid item>
                 <TextField
+                  variant="outlined"
                   id="newFolderName"
-                  label="Folder"
+                  label="Folder name"
                   size="small"
+                  className="newFolderTextfield"
                   onChange={(e) => {setNewFolderName(e.target.value)}}
                   error={newFolderError}
                   helperText={inputNewFolderError}
@@ -233,7 +241,14 @@ export default function NewPrefabDialog(props) {
                 />
               </Grid>
               <Grid item>
-                <Button variant="contained" color="primary" size="small" startIcon={<CreateNewFolderIcon/>} onClick={handleCreateNewFolder}>
+                <Button
+                  className="newFolderAddButton"
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  startIcon={<CreateNewFolderIcon/>}
+                  onClick={handleCreateNewFolder}
+                >
                   Add
                 </Button>
               </Grid>
